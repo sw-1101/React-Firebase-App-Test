@@ -1,4 +1,5 @@
 // メインアプリケーションコンポーネント
+import { BrowserRouter } from 'react-router-dom'
 import { AuthProvider } from './contexts/AuthContext'
 import { AppLayout } from './components/layout'
 import AppRoutes from './routes/AppRoutes'
@@ -10,11 +11,13 @@ import AppRoutes from './routes/AppRoutes'
 
 function App() {
   return (
-    <AuthProvider>
-      <AppLayout>
-        <AppRoutes />
-      </AppLayout>
-    </AuthProvider>
+    <BrowserRouter>
+      <AuthProvider>
+        <AppLayout>
+          <AppRoutes />
+        </AppLayout>
+      </AuthProvider>
+    </BrowserRouter>
   )
 }
 

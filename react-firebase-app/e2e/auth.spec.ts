@@ -6,7 +6,7 @@ test.describe('Authentication Flow', () => {
   })
 
   test('should display login page for unauthenticated users', async ({ page }) => {
-    await expect(page.locator('h4')).toContainText('ログイン')
+    await expect(page.locator('h1')).toContainText('ログイン')
     await expect(page.locator('input[type="email"]')).toBeVisible()
     await expect(page.locator('input[type="password"]')).toBeVisible()
     await expect(page.locator('button:has-text("ログイン")')).toBeVisible()
@@ -20,9 +20,10 @@ test.describe('Authentication Flow', () => {
 
   test('should navigate to register form', async ({ page }) => {
     await page.click('text=新規登録はこちら')
-    await expect(page.locator('h4')).toContainText('新規登録')
+    await expect(page.locator('h1')).toContainText('新規登録')
     await expect(page.locator('input[type="email"]')).toBeVisible()
-    await expect(page.locator('input[type="password"]')).toBeVisible()
+    await expect(page.locator('input[name="password"]')).toBeVisible()
+    await expect(page.locator('input[name="confirmPassword"]')).toBeVisible()
     await expect(page.locator('button:has-text("登録")')).toBeVisible()
   })
 

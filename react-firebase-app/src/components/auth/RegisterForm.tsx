@@ -74,8 +74,8 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
   return (
     <Card sx={{ maxWidth: 400, mx: 'auto', mt: 4 }}>
       <CardContent>
-        <Typography variant="h5" component="h1" gutterBottom align="center">
-          アカウント作成
+        <Typography variant="h4" component="h1" gutterBottom align="center">
+          新規登録
         </Typography>
         
         {error && (
@@ -139,7 +139,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
             sx={{ mt: 3, mb: 2 }}
             disabled={loading}
           >
-            {loading ? 'アカウント作成中...' : 'アカウント作成'}
+            {loading ? '登録中...' : '登録'}
           </Button>
         </Box>
       </CardContent>
