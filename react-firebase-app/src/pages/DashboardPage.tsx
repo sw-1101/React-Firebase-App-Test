@@ -17,7 +17,8 @@ import {
   List, 
   Logout,
   Person,
-  Storage 
+  Storage,
+  RecordVoiceOver
 } from '@mui/icons-material'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
@@ -56,6 +57,13 @@ const DashboardPage: React.FC = () => {
       icon: <Storage fontSize="large" />,
       path: '/data',
       color: 'secondary' as const,
+    },
+    {
+      title: '音声とアップロードテスト',
+      description: 'マルチモーダル入力機能のテスト',
+      icon: <RecordVoiceOver fontSize="large" />,
+      path: '/content',
+      color: 'success' as const,
     },
   ]
 
