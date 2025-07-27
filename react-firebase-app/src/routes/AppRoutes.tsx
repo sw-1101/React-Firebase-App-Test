@@ -9,6 +9,7 @@ import {
   ProfilePage, 
   DataPage 
 } from '../pages'
+import ContentPage from '../pages/ContentPage'
 
 // Vue.js経験者向け解説:
 // - BrowserRouter: Vue RouterのcreateWebHistory()と同様
@@ -45,6 +46,14 @@ const AppRoutes: React.FC = () => {
         element={
           <PrivateRoute>
             <DataPage />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/content"
+        element={
+          <PrivateRoute>
+            <ContentPage />
           </PrivateRoute>
         }
       />
