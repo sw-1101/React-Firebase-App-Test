@@ -31,9 +31,28 @@ export const loginUser = async (credentials: LoginCredentials): Promise<User> =>
       credentials.password
     )
     return mapFirebaseUser(userCredential.user)
-  } catch (error) {
-    console.error('Login error:', error)
-    throw error
+  } catch (error: any) {
+    // セキュリティ対策: 詳細なエラー情報を隠蔽し、汎用的なメッセージを返す
+    // 攻撃者による情報収集を防ぐため、Firebase のエラーコードを直接公開しない
+    
+    // 開発環境でのみ詳細ログを出力（本番では出力されない）
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Login error (dev only):', error)
+    }
+    
+    // Firebase のエラーコードに応じて適切なメッセージを設定
+    // ただし、アカウント存在の有無は漏らさない
+    let userMessage = 'ログインに失敗しました。メールアドレスまたはパスワードを確認してください。'
+    
+    if (error.code === 'auth/too-many-requests') {
+      userMessage = 'ログイン試行回数が上限に達しました。しばらく時間をおいてから再度お試しください。'
+    } else if (error.code === 'auth/network-request-failed') {
+      userMessage = 'ネットワークエラーが発生しました。インターネット接続を確認してください。'
+    }
+    
+    // カスタムエラーオブジェクトを作成（元のエラー情報は含めない）
+    const secureError = new Error(userMessage)
+    throw secureError
   }
 }
 
@@ -54,9 +73,32 @@ export const registerUser = async (credentials: RegisterCredentials): Promise<Us
     }
     
     return mapFirebaseUser(userCredential.user)
-  } catch (error) {
-    console.error('Registration error:', error)
-    throw error
+  } catch (error: any) {
+    // セキュリティ対策: 詳細なエラー情報を隠蔽し、汎用的なメッセージを返す
+    
+    // 開発環境でのみ詳細ログを出力
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Registration error (dev only):', error)
+    }
+    
+    // Firebase のエラーコードに応じて適切なメッセージを設定
+    let userMessage = 'アカウントの作成に失敗しました。しばらく時間をおいてから再度お試しください。'
+    
+    if (error.code === 'auth/email-already-in-use') {
+      userMessage = 'このメールアドレスは既に使用されています。別のメールアドレスをお試しください。'
+    } else if (error.code === 'auth/weak-password') {
+      userMessage = 'パスワードが弱すぎます。より強固なパスワードを設定してください。'
+    } else if (error.code === 'auth/invalid-email') {
+      userMessage = 'メールアドレスの形式が正しくありません。'
+    } else if (error.code === 'auth/too-many-requests') {
+      userMessage = 'アカウント作成の試行回数が上限に達しました。しばらく時間をおいてから再度お試しください。'
+    } else if (error.code === 'auth/network-request-failed') {
+      userMessage = 'ネットワークエラーが発生しました。インターネット接続を確認してください。'
+    }
+    
+    // カスタムエラーオブジェクトを作成
+    const secureError = new Error(userMessage)
+    throw secureError
   }
 }
 

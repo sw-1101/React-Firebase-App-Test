@@ -47,10 +47,56 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess }) => {
     return undefined
   }
 
+  // セキュリティ強化: 包括的なパスワード強度チェック
+  const validatePasswordStrength = (password: string): { isValid: boolean; message?: string } => {
+    if (!password) {
+      return { isValid: false, message: 'パスワードを入力してください' }
+    }
+    
+    // 最小長チェック（8文字以上）
+    if (password.length < 8) {
+      return { isValid: false, message: 'パスワードは8文字以上で入力してください' }
+    }
+    
+    // 最大長チェック（128文字以下）
+    if (password.length > 128) {
+      return { isValid: false, message: 'パスワードは128文字以下で入力してください' }
+    }
+    
+    // 文字種チェック
+    const hasLowercase = /[a-z]/.test(password)
+    const hasUppercase = /[A-Z]/.test(password)
+    const hasNumbers = /\d/.test(password)
+    const hasSpecialChars = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)
+    
+    const typesUsed = [hasLowercase, hasUppercase, hasNumbers, hasSpecialChars].filter(Boolean).length
+    
+    if (typesUsed < 3) {
+      return { 
+        isValid: false, 
+        message: 'パスワードには以下のうち3種類以上を含めてください: 小文字、大文字、数字、記号' 
+      }
+    }
+    
+    // よくあるパスワードパターンのチェック
+    const commonPatterns = [
+      /^(.)\1+$/, // 同じ文字の繰り返し（例: aaaaaaa）
+      /^(012|123|234|345|456|567|678|789|890|987|876|765|654|543|432|321|210)/, // 連続する数字
+      /^(abc|bcd|cde|def|efg|fgh|ghi|hij|ijk|jkl|klm|lmn|mno|nop|opq|pqr|qrs|rst|stu|tuv|uvw|vwx|wxy|xyz)/, // 連続するアルファベット
+      /(password|pass|123456|qwerty|admin|test|user)/i // よくあるパスワード
+    ]
+    
+    for (const pattern of commonPatterns) {
+      if (pattern.test(password)) {
+        return { isValid: false, message: '推測しやすいパスワードは使用できません' }
+      }
+    }
+    
+    return { isValid: true }
+  }
   const validatePassword = (password: string): string | undefined => {
-    if (!password) return 'パスワードを入力してください'
-    if (password.length < 6) return 'パスワードは6文字以上で入力してください'
-    return undefined
+    const result = validatePasswordStrength(password)
+    return result.isValid ? undefined : result.message
   }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {

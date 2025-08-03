@@ -1,8 +1,8 @@
 # 🚀 React Firebase Sample App
 
-**Vue.js開発者のためのReact学習用実践プロジェクト**
+**わたなべによるわたなべのためのReact学習用プロジェクト**
 
-React + TypeScript + Firebase を使用したモダンなWebアプリケーション開発を、実際に動くアプリケーションを通じて学習できます。
+React + TypeScript + Firebase + Gemini AI を利用したわたなべのお勉強アプリ
 
 [![CI/CD](https://github.com/your-repo/react-firebase-app/workflows/CI%2FCD%20Pipeline/badge.svg)](https://github.com/your-repo/react-firebase-app/actions)
 [![Storybook](https://img.shields.io/badge/Storybook-FF4785?style=flat&logo=storybook&logoColor=white)](https://your-storybook-url.com)
@@ -17,6 +17,10 @@ React + TypeScript + Firebase を使用したモダンなWebアプリケーシ�
 
 ### 特徴
 - 🔥 **Modern Stack**: React 19 + TypeScript + Firebase
+- 🤖 **AI Integration**: Gemini API によるマルチモーダル処理
+- 🎵 **Audio Features**: 音声録音・再生・文字起こし
+- 📁 **File Upload**: 画像・動画・PDF・Excel・Markdown対応
+- 🔍 **AI Search**: 自然言語検索機能
 - 📚 **Storybook**: コンポーネント駆動開発
 - 🎭 **E2E Testing**: Playwright による自動テスト
 - 🚀 **CI/CD**: GitHub Actions による自動化
@@ -45,7 +49,13 @@ React + TypeScript + Firebase を使用したモダンなWebアプリケーシ�
 
 ## 🚀 クイックスタート
 
-### 1. 環境構築
+### ⚡ 簡単セットアップ
+
+**個人のFirebaseプロジェクトでアプリを動作させる場合：**
+
+👉 **[詳細セットアップガイド](./SETUP_GUIDE.md)** を参照してください
+
+### 開発者向けクイックスタート
 
 ```bash
 # リポジトリクローン
@@ -54,15 +64,21 @@ cd react-firebase-app
 
 # 依存関係インストール
 npm install
+
+# 環境変数設定（.env.local作成）
+# 詳細は SETUP_GUIDE.md を参照
+
+# 開発サーバー起動
+npm run dev
 ```
 
-### 2. Firebase設定
+### Firebase・Gemini API設定
 
 ```bash
 # Firebase CLI インストール（グローバル）
 npm install -g firebase-tools
 
-# Firebaseプロジェクト作成・設定
+# Firebase & Gemini API設定
 firebase login
 firebase init
 ```
@@ -276,14 +292,6 @@ graph LR
 2. **[Branch Protection](./.github/workflows/branch-protection.yml)** - PR品質チェック
 3. **[Preview Deploy](./.github/workflows/preview.yml)** - プレビュー環境
 4. **[PR Automation](./.github/workflows/pr-automation.yml)** - PR自動化
-
-### 品質ゲート
-- ✅ TypeScript エラーゼロ
-- ✅ ESLint エラーゼロ  
-- ✅ テスト成功率 98%以上
-- ✅ E2Eテスト全通過
-- ✅ セキュリティスキャン完了
-
 ---
 
 ## 📊 Vue.js → React 移行ガイド
@@ -478,19 +486,6 @@ firebase hosting:channel:deploy preview-branch
 
 ---
 
-## 📊 プロジェクト統計
-
-| 指標 | 現在値 | 目標値 |
-|------|--------|--------|
-| **TypeScript Coverage** | 100% | 100% |
-| **Test Coverage** | 85% | 80%+ |
-| **E2E Coverage** | 45% | 40%+ |
-| **Storybook Coverage** | 70% | 60%+ |
-| **Performance Score** | 95+ | 90+ |
-| **Accessibility Score** | 100 | 95+ |
-
----
-
 ## 🎉 今後の拡張予定
 
 ### 短期 (1-3ヶ月)
@@ -513,20 +508,6 @@ firebase hosting:channel:deploy preview-branch
 
 ---
 
-## 📞 サポート
-
-### 質問・相談
-- 🐛 **バグ報告**: [GitHub Issues](https://github.com/your-repo/react-firebase-app/issues)
-- 💡 **機能要望**: [GitHub Discussions](https://github.com/your-repo/react-firebase-app/discussions)
-- 📧 **その他**: your-email@example.com
-
-### コミュニティ
-- 💬 **Discord**: [開発者コミュニティ](https://discord.gg/your-server)
-- 🐦 **Twitter**: [@your_handle](https://twitter.com/your_handle)
-- 📺 **YouTube**: [開発チュートリアル](https://youtube.com/your-channel)
-
----
-
 ## 📄 ライセンス
 
 このプロジェクトは [MIT License](./LICENSE) の下で公開されています。
@@ -544,11 +525,6 @@ firebase hosting:channel:deploy preview-branch
 - [Playwright](https://playwright.dev/) - E2Eテスト
 - [Vite](https://vitejs.dev/) - ビルドツール
 
----
-
-<div align="center">
-
-**🚀 Happy Coding with React! 🎉**
 
 [⭐ Star this repo](https://github.com/your-repo/react-firebase-app) | [🐛 Report Bug](https://github.com/your-repo/react-firebase-app/issues) | [💡 Request Feature](https://github.com/your-repo/react-firebase-app/issues)
 
