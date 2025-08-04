@@ -10,6 +10,7 @@ import {
   DataPage 
 } from '../pages'
 import ContentPage from '../pages/ContentPage'
+import MemoListPage from '../pages/MemoListPage'
 
 // Vue.js経験者向け解説:
 // - BrowserRouter: Vue RouterのcreateWebHistory()と同様
@@ -57,9 +58,17 @@ const AppRoutes: React.FC = () => {
           </PrivateRoute>
         }
       />
+      <Route
+        path="/memos"
+        element={
+          <PrivateRoute>
+            <MemoListPage />
+          </PrivateRoute>
+        }
+      />
       
       {/* デフォルトルート */}
-      <Route path="/" element={<Navigate to="/login" replace />} />
+      <Route path="/" element={<Navigate to="/dashboard" replace />} />
       
       {/* 404ページ（該当するルートがない場合） */}
       <Route path="*" element={<Navigate to="/login" replace />} />

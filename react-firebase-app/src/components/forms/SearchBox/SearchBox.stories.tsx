@@ -240,11 +240,11 @@ export const TechStackSelector: Story = {
           multiple
           showFilter
           width="100%"
-          onMultipleChange={(values) => {
-            console.log('選択された技術:', values)
+          onMultipleChange={() => {
+
           }}
           onFilterClick={() => {
-            console.log('フィルターメニューを開く')
+
           }}
         />
         <p style={{ marginTop: '1rem', fontSize: '0.875rem', color: '#666' }}>
@@ -282,11 +282,11 @@ export const SearchDemo: Story = {
           options={searchResults}
           width="100%"
           onSearch={(query) => {
-            console.log('検索クエリ:', query)
+
             alert(`"${query}" で検索しました`)
           }}
-          onChange={(value) => {
-            console.log('入力値:', value)
+          onChange={() => {
+
           }}
         />
         <div style={{ marginTop: '1rem', fontSize: '0.875rem', color: '#666' }}>

@@ -3,27 +3,26 @@ import {
   Box,
   Paper,
   Typography,
-  Button,
-  TextField,
   IconButton,
+  Button,
   Chip,
   LinearProgress,
-  Alert,
+  TextField,
+  Alert
 } from '@mui/material';
 import {
   Mic,
   MicOff,
-  Upload,
   Send,
-  AudioFile,
-  VideoFile,
-  PictureAsPdf,
-  TableChart,
-  Image as ImageIcon,
   PlayArrow,
   Pause,
-  Delete,
+  AudioFile,
+  VideoLibrary as VideoFile,
+  Image as ImageIcon,
+  PictureAsPdf,
+  TableChart,
   Description,
+  Upload
 } from '@mui/icons-material';
 
 interface UploadedFile {

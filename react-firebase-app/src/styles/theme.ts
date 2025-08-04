@@ -1,5 +1,5 @@
-import { createTheme, ThemeOptions } from '@mui/material/styles';
-import { UI_CONFIG } from '../constants';
+import { createTheme, type ThemeOptions } from '@mui/material/styles';
+// import { UI_CONFIG } from '../constants';
 
 // Color palette based on design specification
 const palette = {

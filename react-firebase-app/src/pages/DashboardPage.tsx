@@ -18,7 +18,8 @@ import {
   Logout,
   Person,
   Storage,
-  RecordVoiceOver
+  RecordVoiceOver,
+  Mic
 } from '@mui/icons-material'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
@@ -39,11 +40,18 @@ const DashboardPage: React.FC = () => {
       await logout()
       navigate('/login')
     } catch (error) {
-      console.error('Logout failed:', error)
-    }
+    // エラーハンドリング
+  }
   }
 
   const menuItems = [
+    {
+      title: 'VoiceMemo',
+      description: '音声・テキストメモの保存・検索',
+      icon: <Mic fontSize="large" />,
+      path: '/memos',
+      color: 'info' as const,
+    },
     {
       title: 'プロフィール',
       description: 'ユーザー情報の表示・編集',

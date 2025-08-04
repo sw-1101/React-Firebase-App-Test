@@ -70,27 +70,25 @@ const ContentPage: React.FC = () => {
   // コンテンツ一覧を読み込み
   const loadContents = async () => {
     if (!user) {
-      console.log('loadContents: No user found');
+
       return;
     }
 
     try {
       setLoading(true);
       setError(''); // エラーをクリア
-      console.log('loadContents: Loading contents for user:', user.uid);
-      
+
       const userContents = await getUserContents(user.uid);
-      console.log('loadContents: Loaded', userContents.length, 'contents');
-      
+
       setContents(userContents);
       
       if (userContents.length === 0) {
-        console.log('loadContents: No contents found for this user');
+
       }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'コンテンツの読み込みに失敗しました';
       setError(errorMessage);
-      console.error('Error loading contents:', err);
+
     } finally {
       setLoading(false);
     }
@@ -127,7 +125,7 @@ const ContentPage: React.FC = () => {
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'コンテンツの処理に失敗しました';
       setError(errorMessage);
-      console.error('Error processing content:', err);
+
     } finally {
       setLoading(false);
     }
@@ -145,7 +143,7 @@ const ContentPage: React.FC = () => {
       setSuccess('コンテンツが更新されました');
     } catch (err) {
       setError('コンテンツの更新に失敗しました');
-      console.error('Error updating content:', err);
+
     }
   };
 
@@ -157,7 +155,7 @@ const ContentPage: React.FC = () => {
       setSuccess('コンテンツが削除されました');
     } catch (err) {
       setError('コンテンツの削除に失敗しました');
-      console.error('Error deleting content:', err);
+
     }
   };
 

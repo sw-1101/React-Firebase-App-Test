@@ -16,13 +16,10 @@ import type { ProcessedContent } from './geminiService';
 // Firestore接続テスト
 export async function testFirestoreConnection(): Promise<boolean> {
   try {
-    console.log('Testing Firestore connection...');
     const testQuery = query(collection(db, 'contents'));
     await getDocs(testQuery);
-    console.log('Firestore connection successful');
     return true;
   } catch (error) {
-    console.error('Firestore connection failed:', error);
     return false;
   }
 }
@@ -84,7 +81,7 @@ export async function saveContent(content: ProcessedContent, userId: string): Pr
     const docRef = await addDoc(collection(db, 'contents'), contentData);
     return docRef.id;
   } catch (error) {
-    console.error('Error saving content:', error);
+
     throw new Error('コンテンツの保存に失敗しました');
   }
 }
@@ -92,8 +89,7 @@ export async function saveContent(content: ProcessedContent, userId: string): Pr
 // ユーザーのコンテンツ一覧を取得
 export async function getUserContents(userId: string): Promise<ProcessedContent[]> {
   try {
-    console.log('getUserContents called with userId:', userId);
-    
+
     // まず基本的なクエリから試す（インデックスの問題を回避）
     const q = query(
       collection(db, 'contents'),
@@ -101,21 +97,18 @@ export async function getUserContents(userId: string): Promise<ProcessedContent[
     );
     
     const querySnapshot = await getDocs(q);
-    console.log('Query snapshot size:', querySnapshot.size);
-    
+
     const contents = querySnapshot.docs.map(fromFirestoreContent);
     
     // クライアント側でソート（Firestoreインデックス問題を回避）
     contents.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
-    
-    console.log('Fetched contents:', contents.length);
+
     return contents;
   } catch (error) {
-    console.error('Error fetching contents:', error);
-    
+
     // フォールバック: 全データを取得してクライアント側でフィルタ
     try {
-      console.log('Trying fallback method...');
+
       const allQuery = query(collection(db, 'contents'));
       const allSnapshot = await getDocs(allQuery);
       
@@ -129,11 +122,10 @@ export async function getUserContents(userId: string): Promise<ProcessedContent[
       
       // 時間順でソート
       userContents.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
-      
-      console.log('Fallback method found:', userContents.length, 'contents');
+
       return userContents;
     } catch (fallbackError) {
-      console.error('Fallback method also failed:', fallbackError);
+
       throw new Error('コンテンツの取得に失敗しました');
     }
   }
@@ -152,7 +144,7 @@ export async function getContentsByCategory(userId: string, category: string): P
     const querySnapshot = await getDocs(q);
     return querySnapshot.docs.map(fromFirestoreContent);
   } catch (error) {
-    console.error('Error fetching contents by category:', error);
+
     throw new Error('カテゴリ別コンテンツの取得に失敗しました');
   }
 }
@@ -170,7 +162,7 @@ export async function getContentsByTag(userId: string, tag: string): Promise<Pro
     const querySnapshot = await getDocs(q);
     return querySnapshot.docs.map(fromFirestoreContent);
   } catch (error) {
-    console.error('Error fetching contents by tag:', error);
+
     throw new Error('タグ別コンテンツの取得に失敗しました');
   }
 }
@@ -180,7 +172,7 @@ export async function deleteContent(contentId: string): Promise<void> {
   try {
     await deleteDoc(doc(db, 'contents', contentId));
   } catch (error) {
-    console.error('Error deleting content:', error);
+
     throw new Error('コンテンツの削除に失敗しました');
   }
 }
@@ -198,7 +190,7 @@ export async function updateContent(contentId: string, updates: Partial<Processe
     
     await updateDoc(doc(db, 'contents', contentId), updateData);
   } catch (error) {
-    console.error('Error updating content:', error);
+
     throw new Error('コンテンツの更新に失敗しました');
   }
 }
@@ -225,7 +217,7 @@ export async function getContentStats(userId: string): Promise<{
       recentContents,
     };
   } catch (error) {
-    console.error('Error fetching content stats:', error);
+
     throw new Error('統計情報の取得に失敗しました');
   }
 }

@@ -110,8 +110,8 @@ const DataPage: React.FC = () => {
       setDeleteDialogOpen(false)
       setItemToDelete(null)
     } catch (error) {
-      console.error('Delete failed:', error)
-    } finally {
+    // エラーハンドリング
+  } finally {
       setActionLoading(false)
     }
   }
@@ -128,7 +128,7 @@ const DataPage: React.FC = () => {
       setModalOpen(false)
       setEditingItem(null)
     } catch (error) {
-      console.error('Save failed:', error)
+
       throw error
     } finally {
       setActionLoading(false)

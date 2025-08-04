@@ -1,9 +1,9 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { 
-  RecordingState, 
-  AudioRecording, 
-  AudioError,
-  RecordingSession 
+  type RecordingState, 
+  type AudioRecording, 
+  type AudioError,
+  type RecordingSession 
 } from '../types/memo/Audio';
 import { getAudioRecorder, audioUtils } from '../services/audio/recorder';
 import { AUDIO_CONFIG } from '../constants/audioConfig';
@@ -123,7 +123,7 @@ export const useAudioRecording = (
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to initialize recorder';
       setError(errorMessage);
-      console.error('Audio recorder initialization failed:', err);
+
     }
   }, [isInitialized, onError, onRecordingComplete]);
 

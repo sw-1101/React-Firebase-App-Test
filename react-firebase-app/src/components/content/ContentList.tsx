@@ -10,7 +10,6 @@ import {
   MenuItem,
   TextField,
   Button,
-  Grid,
   Alert,
   Pagination,
   FormControl,
@@ -45,7 +44,6 @@ const ITEMS_PER_PAGE = 6;
 
 const ContentList: React.FC<ContentListProps> = ({
   contents,
-  onContentUpdate,
   onContentDelete,
   onRefresh,
 }) => {
@@ -87,7 +85,7 @@ const ContentList: React.FC<ContentListProps> = ({
       setCurrentPage(1);
     } catch (err) {
       setError('検索に失敗しました');
-      console.error('Search error:', err);
+
     } finally {
       setIsSearching(false);
     }
@@ -162,8 +160,8 @@ const ContentList: React.FC<ContentListProps> = ({
 
       {/* 検索・フィルター */}
       <Box sx={{ mb: 3 }}>
-        <Grid container spacing={2} alignItems="center">
-          <Grid item xs={12} md={6}>
+        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, alignItems: 'center' }}>
+          <Box sx={{ flex: '1 1 300px', minWidth: '200px' }}>
             <TextField
               fullWidth
               placeholder="テスト結果を検索... (例: こんな感じのもの探してみて)"
@@ -182,8 +180,8 @@ const ContentList: React.FC<ContentListProps> = ({
                 ),
               }}
             />
-          </Grid>
-          <Grid item xs={12} md={3}>
+          </Box>
+          <Box sx={{ flex: '0 0 200px' }}>
             <FormControl fullWidth>
               <InputLabel>カテゴリ</InputLabel>
               <Select
@@ -200,8 +198,8 @@ const ContentList: React.FC<ContentListProps> = ({
                 ))}
               </Select>
             </FormControl>
-          </Grid>
-          <Grid item xs={12} md={3}>
+          </Box>
+          <Box sx={{ flex: '0 0 120px' }}>
             <Button
               variant="outlined"
               onClick={onRefresh}
@@ -209,14 +207,14 @@ const ContentList: React.FC<ContentListProps> = ({
             >
               更新
             </Button>
-          </Grid>
-        </Grid>
+          </Box>
+        </Box>
       </Box>
 
       {/* コンテンツ一覧 */}
-      <Grid container spacing={2}>
+      <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(2, 1fr)', lg: 'repeat(3, 1fr)' }, gap: 2 }}>
         {displayedContents.map((content) => (
-          <Grid item xs={12} md={6} lg={4} key={content.id}>
+          <Box key={content.id}>
             <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
               <CardContent sx={{ flexGrow: 1 }}>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
@@ -248,15 +246,18 @@ const ContentList: React.FC<ContentListProps> = ({
                       添付ファイル:
                     </Typography>
                     <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mt: 0.5 }}>
-                      {content.files.map((file, index) => (
-                        <Chip
-                          key={index}
-                          icon={getFileIcon(file.type)}
-                          label={file.name.length > 15 ? `${file.name.substring(0, 15)}...` : file.name}
-                          size="small"
-                          variant="outlined"
-                        />
-                      ))}
+                      {content.files.map((file, index) => {
+                        const icon = getFileIcon(file.type);
+                        return (
+                          <Chip
+                            key={index}
+                            {...(icon ? { icon } : {})}
+                            label={file.name.length > 15 ? `${file.name.substring(0, 15)}...` : file.name}
+                            size="small"
+                            variant="outlined"
+                          />
+                        );
+                      })}
                     </Box>
                   </Box>
                 )}
@@ -281,9 +282,9 @@ const ContentList: React.FC<ContentListProps> = ({
                 </Box>
               </CardContent>
             </Card>
-          </Grid>
+          </Box>
         ))}
-      </Grid>
+      </Box>
 
       {/* テスト結果が空の場合 */}
       {filteredContents.length === 0 && (

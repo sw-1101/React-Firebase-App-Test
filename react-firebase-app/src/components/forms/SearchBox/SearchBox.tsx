@@ -47,6 +47,8 @@ export interface SearchBoxProps {
   onClear?: () => void
   /** フィルターボタンクリック時のコールバック */
   onFilterClick?: () => void
+  /** 全幅表示 */
+  fullWidth?: boolean
 }
 
 const SearchBox: React.FC<SearchBoxProps> = ({
@@ -60,6 +62,7 @@ const SearchBox: React.FC<SearchBoxProps> = ({
   disabled = false,
   showFilter = false,
   loading = false,
+  fullWidth = false,
   onSearch,
   onChange,
   onMultipleChange,
@@ -93,7 +96,7 @@ const SearchBox: React.FC<SearchBoxProps> = ({
   // 単一選択の場合
   if (!multiple) {
     return (
-      <Box sx={{ width }}>
+      <Box sx={{ width: fullWidth ? '100%' : width }}>
         <TextField
           fullWidth
           size={size}

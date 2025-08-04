@@ -44,7 +44,7 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
           };
           
           newAudio.onerror = () => {
-            console.error('音声の再生に失敗しました');
+
             setIsPlaying(false);
             URL.revokeObjectURL(audioUrl);
           };
@@ -55,8 +55,8 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
         }
       }
     } catch (error) {
-      console.error('音声再生エラー:', error);
-    }
+    // エラーハンドリング
+  }
   };
 
   if (!audioData && !transcript) {

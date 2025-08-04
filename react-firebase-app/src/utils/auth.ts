@@ -37,7 +37,7 @@ export const loginUser = async (credentials: LoginCredentials): Promise<User> =>
     
     // 開発環境でのみ詳細ログを出力（本番では出力されない）
     if (process.env.NODE_ENV === 'development') {
-      console.error('Login error (dev only):', error)
+
     }
     
     // Firebase のエラーコードに応じて適切なメッセージを設定
@@ -78,7 +78,7 @@ export const registerUser = async (credentials: RegisterCredentials): Promise<Us
     
     // 開発環境でのみ詳細ログを出力
     if (process.env.NODE_ENV === 'development') {
-      console.error('Registration error (dev only):', error)
+
     }
     
     // Firebase のエラーコードに応じて適切なメッセージを設定
@@ -107,7 +107,7 @@ export const logoutUser = async (): Promise<void> => {
   try {
     await signOut(auth)
   } catch (error) {
-    console.error('Logout error:', error)
+
     throw error
   }
 }

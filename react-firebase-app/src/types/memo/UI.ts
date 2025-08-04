@@ -1,4 +1,4 @@
-import { Memo } from './Memo';
+import type { Memo } from './Memo';
 
 /**
  * UI state for modals

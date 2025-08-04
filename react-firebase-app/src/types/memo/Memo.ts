@@ -75,7 +75,7 @@ export type TranscriptionStatus =
  * Memo creation data (before saving to Firestore)
  */
 export interface CreateMemoData {
-  userId: string;
+  userId?: string;
   title?: string;
   type: MemoType;
   // Audio-specific fields
@@ -84,6 +84,7 @@ export interface CreateMemoData {
   duration?: number;
   waveformData?: number[];
   fileSize?: number;
+  audioBlob?: Blob;
   // Text-specific fields
   textContent?: string;
 }
@@ -93,10 +94,14 @@ export interface CreateMemoData {
  */
 export interface UpdateMemoData {
   title?: string;
+  audioUrl?: string;
   transcription?: string;
   transcriptionStatus?: TranscriptionStatus;
   transcriptionRetryCount?: number;
   textContent?: string;
+  language?: string;
+  confidence?: number;
+  segments?: any[];
   updatedAt?: Timestamp;
 }
 

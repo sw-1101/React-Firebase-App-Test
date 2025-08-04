@@ -180,7 +180,7 @@ ${fullText}
     };
     
   } catch (error) {
-    console.error('Gemini processing error:', error);
+
     throw new Error('AI処理に失敗しました。APIキーを確認してください。');
   }
 }
@@ -252,7 +252,7 @@ ${JSON.stringify(contentSummary, null, 2)}
     return orderedResults;
     
   } catch (error) {
-    console.error('Search error:', error);
+
     // フォールバック検索
     return existingContent.filter(content => 
       content.summary.toLowerCase().includes(query.toLowerCase()) ||

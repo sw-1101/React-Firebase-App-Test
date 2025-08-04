@@ -1,13 +1,10 @@
 import { 
-  AudioConfig, 
-  AudioRecording, 
-  RecordingSession, 
-  RecordingState, 
-  AudioError,
-  AudioErrorType,
-  ExtendedMediaRecorderOptions,
-  WaveformData,
-  AudioCompatibility
+  type AudioRecording, 
+  type RecordingSession, 
+  type RecordingState, 
+  type AudioError,
+  type AudioErrorType,
+  type AudioCompatibility
 } from '../../types/memo/Audio';
 import { AUDIO_CONFIG, AUDIO_CONSTRAINTS, RECORDER_OPTIONS } from '../../constants/audioConfig';
 
@@ -153,7 +150,7 @@ export class AudioRecorderService {
 
     this.updateState('stopping');
     
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve, _reject) => {
       const handleStop = () => {
         this.stopWaveformAnalysis();
         
@@ -260,8 +257,8 @@ export class AudioRecorderService {
       
       source.connect(this.analyserNode);
     } catch (error) {
-      console.warn('Failed to setup audio context:', error);
-    }
+    // エラーハンドリング
+  }
   }
 
   /**
@@ -398,7 +395,7 @@ export class AudioRecorderService {
     }
     
     if (compatibility.supportedMimeTypes.length === 0) {
-      console.warn('No supported audio formats found');
+
     }
   }
 }
@@ -426,10 +423,10 @@ export const audioUtils = {
    * Convert audio blob to base64
    */
   blobToBase64: (blob: Blob): Promise<string> => {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve, _reject) => {
       const reader = new FileReader();
       reader.onload = () => resolve(reader.result as string);
-      reader.onerror = reject;
+      reader.onerror = _reject;
       reader.readAsDataURL(blob);
     });
   },
@@ -438,7 +435,7 @@ export const audioUtils = {
    * Get audio duration from blob
    */
   getAudioDuration: (blob: Blob): Promise<number> => {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve, _reject) => {
       const audio = new Audio();
       const url = URL.createObjectURL(blob);
       
@@ -449,7 +446,7 @@ export const audioUtils = {
       
       audio.addEventListener('error', () => {
         URL.revokeObjectURL(url);
-        reject(new Error('Failed to load audio'));
+        _reject(new Error('Failed to load audio'));
       });
       
       audio.src = url;

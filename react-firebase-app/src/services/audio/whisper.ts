@@ -1,15 +1,15 @@
 import {
-  WhisperTranscriptionRequest,
-  WhisperTranscriptionResponse,
-  WhisperVerboseResponse,
-  TranscriptionConfig,
-  TranscriptionRequest,
-  TranscriptionResult,
-  TranscriptionError,
-  TranscriptionErrorType,
-  TranscriptionServiceStatus,
-  BatchTranscriptionRequest,
-  BatchTranscriptionResult
+  type WhisperTranscriptionRequest,
+  type WhisperTranscriptionResponse,
+  type WhisperVerboseResponse,
+  type TranscriptionConfig,
+  type TranscriptionRequest,
+  type TranscriptionResult,
+  type TranscriptionError,
+  type TranscriptionErrorType,
+  type TranscriptionServiceStatus,
+  type BatchTranscriptionRequest,
+  type BatchTranscriptionResult
 } from '../../types/memo/Whisper';
 
 /**
@@ -134,8 +134,7 @@ export class WhisperService {
       try {
         await this.transcribeAudio(request.audioFile, request.options);
       } catch (error) {
-        console.error(`Transcription failed for request ${request.id}:`, error);
-        
+
         // Retry logic
         if (request.retryCount < this.config.maxRetries) {
           request.retryCount++;
@@ -355,7 +354,7 @@ export class WhisperService {
   /**
    * Determine error type from error message/details
    */
-  private determineErrorType(message: string, details?: any): TranscriptionErrorType {
+  private determineErrorType(message: string, _details?: any): TranscriptionErrorType {
     const lowerMessage = message.toLowerCase();
     
     if (lowerMessage.includes('network') || lowerMessage.includes('fetch')) {

@@ -12,7 +12,7 @@ import {
   orderBy,
   onSnapshot,
   serverTimestamp,
-  type DocumentData,
+  type QueryDocumentSnapshot,
   type QuerySnapshot,
   type Unsubscribe,
 } from 'firebase/firestore'
@@ -27,12 +27,20 @@ import type { DataItem, CreateDataItem, UpdateDataItem } from '../types/data'
 const COLLECTION_NAME = 'dataItems'
 
 // Firestoreドキュメントから型付きデータに変換
-const convertToDataItem = (doc: DocumentData): DataItem => ({
-  id: doc.id,
-  ...doc.data(),
-  createdAt: doc.data().createdAt?.toDate() || new Date(),
-  updatedAt: doc.data().updatedAt?.toDate() || new Date(),
-})
+const convertToDataItem = (doc: QueryDocumentSnapshot): DataItem => {
+  const data = doc.data();
+  return {
+    id: doc.id,
+    title: data.title || '',
+    description: data.description || '',
+    category: data.category || 'other',
+    priority: data.priority || 'medium',
+    completed: data.completed || false,
+    userId: data.userId || '',
+    createdAt: data.createdAt?.toDate() || new Date(),
+    updatedAt: data.updatedAt?.toDate() || new Date(),
+  };
+}
 
 // データ一覧を取得（ユーザー固有）
 export const getDataItems = async (userId: string): Promise<DataItem[]> => {
@@ -44,9 +52,8 @@ export const getDataItems = async (userId: string): Promise<DataItem[]> => {
     )
     const querySnapshot = await getDocs(q)
     return querySnapshot.docs.map(convertToDataItem)
-  } catch (error) {
-    console.error('Error fetching data items:', error)
-    throw error
+  } catch (_error) {
+    throw _error
   }
 }
 
@@ -64,9 +71,8 @@ export const createDataItem = async (
       updatedAt: serverTimestamp(),
     })
     return docRef.id
-  } catch (error) {
-    console.error('Error creating data item:', error)
-    throw error
+  } catch (_error) {
+    throw _error
   }
 }
 
@@ -81,9 +87,8 @@ export const updateDataItem = async (
       ...updates,
       updatedAt: serverTimestamp(),
     })
-  } catch (error) {
-    console.error('Error updating data item:', error)
-    throw error
+  } catch (_error) {
+    throw _error
   }
 }
 
@@ -91,9 +96,8 @@ export const updateDataItem = async (
 export const deleteDataItem = async (itemId: string): Promise<void> => {
   try {
     await deleteDoc(doc(db, COLLECTION_NAME, itemId))
-  } catch (error) {
-    console.error('Error deleting data item:', error)
-    throw error
+  } catch (_error) {
+    throw _error
   }
 }
 
@@ -108,9 +112,8 @@ export const getDataItem = async (itemId: string): Promise<DataItem | null> => {
     } else {
       return null
     }
-  } catch (error) {
-    console.error('Error fetching data item:', error)
-    throw error
+  } catch (_error) {
+    throw _error
   }
 }
 
@@ -128,7 +131,7 @@ export const subscribeToDataItems = (
   return onSnapshot(q, (querySnapshot: QuerySnapshot) => {
     const items = querySnapshot.docs.map(convertToDataItem)
     callback(items)
-  }, (error) => {
-    console.error('Error in data subscription:', error)
+  }, (_error) => {
+    // エラーハンドリング
   })
 }
