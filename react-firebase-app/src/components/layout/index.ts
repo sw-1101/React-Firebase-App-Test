@@ -1,2 +1,6 @@
-// レイアウトコンポーネントのexport集約
-export { default as AppLayout } from './AppLayout'
+/**
+ * LINE風紫系UI - レイアウトコンポーネント
+ */
+
+export * from './Header';
+export * from './ChatLayout';
