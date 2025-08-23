@@ -4,7 +4,7 @@ on:
   push:
     branches: [ main, develop ]
   pull_request:
-    branches: [ main ]
+    branches: [ main, develop ]
 
 env:
   NODE_VERSION: '20.x'
@@ -69,43 +69,27 @@ jobs:
         path: dist/
         retention-days: 1
 
-  # 本番環境デプロイ (mainブランチのプッシュ時のみ)
-  deploy:
-    name: 🚀 Deploy to Production
+  # develop環境デプロイ用の必須テスト
+  require-tests-for-develop:
+    name: 📝 Tests Required for Develop PR
+    if: github.event_name == 'pull_request' && github.base_ref == 'develop'
     needs: test
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-    
-    environment:
-      name: production
-      url: https://${{ secrets.FIREBASE_PROJECT_ID }}.firebaseapp.com
-    
     steps:
-    - name: 📥 Checkout code
-      uses: actions/checkout@v4
-    
-    - name: 🟢 Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: ${{ env.NODE_VERSION }}
-        cache: 'npm'
-    
-    - name: 📦 Install dependencies
-      run: npm ci
-    
-    - name: 📥 Download build artifacts
-      uses: actions/download-artifact@v4
-      with:
-        name: build-files
-        path: dist/
-    
-    - name: 🚀 Deploy to Firebase Hosting
-      uses: FirebaseExtended/action-hosting-deploy@v0
-      with:
-        repoToken: '${{ secrets.GITHUB_TOKEN }}'
-        firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}'
-        projectId: '${{ secrets.FIREBASE_PROJECT_ID }}'
-        channelId: live
+      - name: ✅ Tests passed for develop
+        run: echo "All tests passed! PR to develop can be approved."
+
+  # main環境デプロイ用の必須テスト  
+  require-tests-for-main:
+    name: 📝 Tests Required for Production PR
+    if: github.event_name == 'pull_request' && github.base_ref == 'main'
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: ✅ Tests passed for production
+        run: |
+          echo "All tests passed!"
+          echo "Ready for production deployment"
 
   # セキュリティスキャン
   security:
