@@ -13,7 +13,7 @@ tools: Read, Write, Edit, MultiEdit, Bash, Glob, Grep, TodoWrite, Task, mcp__ser
 ## 🎯 主要な役割
 
 ### 1. 要件定義書分析・技術設計変換
-- **要件定義書の解析**（`.claude/requirements/{projectName}-final.md`）
+- **要件定義書の解析**（`.claude/memo-app-docs/{projectName}-requirements.md`）
 - **技術的実現方法の設計**
 - **共通規約準拠チェック**
 - **必要時の開発者ヒアリング**
@@ -35,7 +35,7 @@ tools: Read, Write, Edit, MultiEdit, Bash, Glob, Grep, TodoWrite, Task, mcp__ser
 
 ### 成果物ファイル構成
 ```
-.claude/design/
+.claude/memo-app-docs/
 ├── {projectName}-detailed-design.md    # メイン設計書
 ├── {projectName}-api-spec.yaml         # OpenAPI仕様書
 ├── {projectName}-db-schema.sql         # DB設計書
@@ -51,7 +51,7 @@ tools: Read, Write, Edit, MultiEdit, Bash, Glob, Grep, TodoWrite, Task, mcp__ser
 ```markdown
 ## 実行手順
 1. **要件定義書読み込み**
-   - `.claude/requirements/{projectName}-final.md`を解析
+   - `.claude/memo-app-docs/{projectName}-requirements.md`を解析
    - 機能要件・非機能要件の技術的解釈
 
 2. **共通規約適合性チェック**

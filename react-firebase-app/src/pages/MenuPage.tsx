@@ -10,17 +10,7 @@ import {
   Box,
   AppBar,
   Toolbar,
-  IconButton,
-} from '@mui/material'
-import { 
-  AccountCircle, 
-  List, 
-  Logout,
-  Person,
-  Storage,
-  RecordVoiceOver,
-  Mic
-} from '@mui/icons-material'
+} from '@/utils/mui-fallbacks'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { useAuthActions } from '../hooks/useAuthActions'
@@ -30,7 +20,7 @@ import { useAuthActions } from '../hooks/useAuthActions'
 // - Card: マテリアルデザインのカードコンポーネント
 // - AppBar: ナビゲーションヘッダー（VuetifyのVAppBarと同様）
 
-const DashboardPage: React.FC = () => {
+const MenuPage: React.FC = () => {
   const navigate = useNavigate()
   const { state } = useAuth()
   const { logout } = useAuthActions()
@@ -48,30 +38,16 @@ const DashboardPage: React.FC = () => {
     {
       title: 'VoiceMemo',
       description: '音声・テキストメモの保存・検索',
-      icon: <Mic fontSize="large" />,
+      icon: <span style={{fontSize: '2rem'}}>🎙️</span>,
       path: '/memos',
       color: 'info' as const,
     },
     {
       title: 'プロフィール',
       description: 'ユーザー情報の表示・編集',
-      icon: <Person fontSize="large" />,
+      icon: <span style={{fontSize: '2rem'}}>👤</span>,
       path: '/profile',
       color: 'primary' as const,
-    },
-    {
-      title: 'データ一覧',
-      description: 'Firestoreデータの管理',
-      icon: <Storage fontSize="large" />,
-      path: '/data',
-      color: 'secondary' as const,
-    },
-    {
-      title: '音声とアップロードテスト',
-      description: 'マルチモーダル入力機能のテスト',
-      icon: <RecordVoiceOver fontSize="large" />,
-      path: '/content',
-      color: 'success' as const,
     },
   ]
 
@@ -82,19 +58,25 @@ const DashboardPage: React.FC = () => {
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
             React Firebase App
           </Typography>
-          <IconButton color="inherit" onClick={() => navigate('/profile')}>
-            <AccountCircle />
-          </IconButton>
-          <IconButton color="inherit" onClick={handleLogout}>
-            <Logout />
-          </IconButton>
+          <button 
+            style={{background: 'none', border: 'none', color: 'white', fontSize: '1.5rem', cursor: 'pointer', margin: '0 8px'}}
+            onClick={() => navigate('/profile')}
+          >
+            👤
+          </button>
+          <button 
+            style={{background: 'none', border: 'none', color: 'white', fontSize: '1.5rem', cursor: 'pointer', margin: '0 8px'}}
+            onClick={handleLogout}
+          >
+            🚪
+          </button>
         </Toolbar>
       </AppBar>
 
       <Container maxWidth="lg" sx={{ mt: { xs: 2, md: 4 }, mb: { xs: 2, md: 4 }, px: { xs: 2, sm: 3 } }}>
         <Box sx={{ mb: { xs: 3, md: 4 } }}>
           <Typography variant="h4" gutterBottom sx={{ fontSize: { xs: '1.75rem', sm: '2rem' } }}>
-            ダッシュボード
+            メニュー
           </Typography>
           <Typography variant="body1" color="text.secondary" sx={{ fontSize: { xs: '0.875rem', sm: '1rem' } }}>
             こんにちは、{state.user?.displayName || state.user?.email}さん！
@@ -123,9 +105,9 @@ const DashboardPage: React.FC = () => {
               }}
             >
               <CardContent sx={{ flexGrow: 1, textAlign: 'center' }}>
-                <Box sx={{ mb: 2, color: `${item.color}.main` }}>
+                <div style={{ marginBottom: '16px' }}>
                   {item.icon}
-                </Box>
+                </div>
                 <Typography variant="h6" gutterBottom>
                   {item.title}
                 </Typography>
@@ -138,7 +120,6 @@ const DashboardPage: React.FC = () => {
                   variant="contained"
                   color={item.color}
                   onClick={() => navigate(item.path)}
-                  startIcon={<List />}
                 >
                   開く
                 </Button>
@@ -151,4 +132,4 @@ const DashboardPage: React.FC = () => {
   )
 }
 
-export default DashboardPage
+export default MenuPage

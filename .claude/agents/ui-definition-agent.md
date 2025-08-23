@@ -69,13 +69,22 @@ UIデザインは「装飾」ではなく「ユーザーを導く」ための意
    - エラーの予防・回復の仕組み
    - 直感的な操作性
 
+## 📂 成果物出力先
+```markdown
+## ファイル構成
+.claude/memo-app-docs/
+├── {projectName}-ui-design.md         # UI設計書
+├── {projectName}-design-system.md     # デザインシステム
+└── {projectName}-components.md        # コンポーネント仕様
+```
+
 ## 📋 UI設計プロセス
 
 ### Phase 1: 要件分析・UX設計
 ```markdown
 ## 実行手順
 1. **要件定義書解析**
-   - `.claude/requirements/{projectName}-final.md`読み込み
+   - `.claude/memo-app-docs/{projectName}-requirements.md`読み込み
    - 機能要件からUI要素抽出
    - ユーザーペルソナ・利用シーン確認
    - **「誰のためのデザインか？」を明確化**

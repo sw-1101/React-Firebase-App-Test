@@ -5,10 +5,10 @@
 }
 
 .input {
-  @apply w-full px-4 py-3 text-base-text-primary bg-base-tertiary border border-base-border rounded-xl;
+  @apply w-full px-4 py-3 text-gray-900 bg-gray-100 border border-gray-300 rounded-xl;
   @apply transition-all duration-200 ease-out;
-  @apply placeholder:text-base-text-secondary;
-  @apply focus:outline-none focus:ring-2 focus:ring-main-primary focus:border-main-primary;
+  @apply placeholder:text-gray-500;
+  @apply focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500;
   
   /* LINE風の滑らかな角丸 */
   border-radius: 20px;
@@ -18,13 +18,13 @@
 }
 
 .input:hover:not(.disabled):not(:focus) {
-  @apply border-main-light bg-base-primary;
+  @apply border-purple-300 bg-white;
   box-shadow: 0 1px 3px rgba(124, 58, 237, 0.1);
 }
 
 .input:focus {
-  @apply bg-base-primary;
-  border-color: var(--main-primary);
+  @apply bg-white;
+  border-color: rgb(124, 58, 237);
   box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
 }
 
@@ -37,24 +37,24 @@
 
 /* エラー状態 */
 .error {
-  @apply border-accent-error;
+  @apply border-red-500;
   box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
 }
 
 .error:focus {
-  @apply ring-accent-error border-accent-error;
+  @apply ring-red-500 border-red-500;
   box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15);
 }
 
 /* 無効化状態 */
 .disabled {
-  @apply opacity-60 cursor-not-allowed bg-base-secondary;
+  @apply opacity-60 cursor-not-allowed bg-gray-200;
   pointer-events: none;
 }
 
 /* エラーメッセージ */
 .errorMessage {
-  @apply text-sm text-accent-error mt-2 px-2;
+  @apply text-sm text-red-500 mt-2 px-2;
   font-weight: 500;
 }
 
@@ -68,11 +68,11 @@
 }
 
 .autoResize::-webkit-scrollbar-thumb {
-  @apply bg-base-border rounded-full;
+  @apply bg-gray-300 rounded-full;
 }
 
 .autoResize::-webkit-scrollbar-thumb:hover {
-  @apply bg-main-light;
+  @apply bg-purple-300;
 }
 
 /* モバイル対応 */
@@ -96,7 +96,7 @@
 }
 
 [data-theme="dark"] .input:hover:not(.disabled):not(:focus) {
-  @apply bg-gray-600 border-main-light;
+  @apply bg-gray-600 border-purple-300;
 }
 
 [data-theme="dark"] .input:focus {
@@ -112,5 +112,5 @@
 }
 
 [data-theme="dark"] .autoResize::-webkit-scrollbar-thumb:hover {
-  @apply bg-main-light;
+  @apply bg-purple-300;
 }

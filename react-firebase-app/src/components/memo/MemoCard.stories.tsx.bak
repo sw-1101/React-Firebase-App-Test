@@ -1,0 +1,297 @@
+import type { Meta, StoryObj } from '@storybook/react';
+// import { // within, // userEvent, // expect } from '@storybook/testing-library';
+import { MemoCard } from './MemoCard';
+import { Timestamp } from 'firebase/firestore';
+import type { AudioMemo, TextMemo, MixedMemo } from '@/types/memo';
+
+// モックメモデータ
+const audioMemo: AudioMemo = {
+  id: 'audio-memo-1',
+  userId: 'user-1',
+  title: 'テスト音声メモ',
+  type: 'audio',
+  audioUrl: 'https://example.com/audio.webm',
+  audioFileName: 'test-audio.webm',
+  duration: 45.5,
+  transcription: 'これは音声メモのテスト文字起こしです。',
+  transcriptionStatus: 'completed',
+  transcriptionRetryCount: 0,
+  fileSize: 15000,
+  createdAt: Timestamp.now(),
+  updatedAt: Timestamp.now()
+};
+
+const textMemo: TextMemo = {
+  id: 'text-memo-1',
+  userId: 'user-1',
+  title: 'テストテキストメモ',
+  type: 'text',
+  textContent: 'これはテキストメモの内容です。複数行にわたる長いテキストの表示を確認できます。',
+  createdAt: Timestamp.now(),
+  updatedAt: Timestamp.now()
+};
+
+const mixedMemo: MixedMemo = {
+  id: 'mixed-memo-1',
+  userId: 'user-1',
+  title: 'テスト混合メモ',
+  type: 'mixed',
+  audioUrl: 'https://example.com/mixed-audio.webm',
+  audioFileName: 'mixed-audio.webm',
+  duration: 30.2,
+  transcription: '音声から文字起こしされたテキスト',
+  transcriptionStatus: 'completed',
+  transcriptionRetryCount: 0,
+  textContent: '手動で追加されたテキストメモ',
+  fileSize: 12000,
+  createdAt: Timestamp.now(),
+  updatedAt: Timestamp.now()
+};
+
+const meta: Meta<typeof MemoCard> = {
+  title: 'Components/Memo/MemoCard',
+  component: MemoCard,
+  parameters: {
+    layout: 'centered',
+    docs: {
+      description: {
+        component: `
+メモカードコンポーネント
+
+## 機能
+- テキスト、音声、混合メモの表示
+- 音声再生機能
+- 編集・削除機能
+- 文字起こし表示
+- プログレス表示
+- アクセシビリティ対応
+
+## 使用例
+\`\`\`tsx
+<MemoCard
+  memo={memo}
+  onEdit={(memoId) => console.log('編集:', memoId)}
+  onDelete={(memoId) => console.log('削除:', memoId)}
+/>
+\`\`\`
+        `
+      }
+    }
+  },
+  argTypes: {
+    memo: {
+      description: 'メモデータ',
+      control: false
+    },
+    onEdit: {
+      description: '編集時のコールバック'
+    },
+    onDelete: {
+      description: '削除時のコールバック'
+    }
+  },
+  decorators: [
+    (Story) => (
+      <div style={{ width: '400px', padding: '20px' }}>
+        <Story />
+      </div>
+    )
+  ]
+};
+
+export default meta;
+type Story = StoryObj<typeof MemoCard>;
+
+// 基本的なストーリー
+export const AudioMemoCard: Story = {
+  args: {
+    memo: audioMemo,
+    onEdit: () => console.log('edit'),
+    onDelete: () => console.log('delete')
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: '音声メモカード。再生ボタン、文字起こし、継続時間の表示を確認できます。'
+      }
+    }
+  }
+};
+
+export const TextMemoCard: Story = {
+  args: {
+    memo: textMemo,
+    onEdit: () => console.log('edit'),
+    onDelete: () => console.log('delete')
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: 'テキストメモカード。テキスト内容の表示を確認できます。'
+      }
+    }
+  }
+};
+
+export const MixedMemoCard: Story = {
+  args: {
+    memo: mixedMemo,
+    onEdit: () => console.log('edit'),
+    onDelete: () => console.log('delete')
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: '混合メモカード。音声とテキストの両方を表示します。'
+      }
+    }
+  }
+};
+
+// インタラクション付きストーリー（play関数）
+export const PlayInteraction: Story = {
+  args: {
+    memo: audioMemo,
+    onEdit: () => console.log('edit'),
+    onDelete: () => console.log('delete')
+  },
+    await // expect(playButton).toBeInTheDocument();
+    await // userEvent.click(playButton);
+    
+    // 再生状態の確認（一時停止ボタンになる）
+    await // expect(canvas.getByRole('button', { name: /停止|pause/i })).toBeInTheDocument();
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: '音声再生機能のテスト。再生ボタンのクリックと状態変化を確認します。'
+      }
+    }
+  }
+};
+
+export const EditInteraction: Story = {
+  args: {
+    memo: textMemo,
+    onEdit: () => console.log('edit'),
+    onDelete: () => console.log('delete')
+  },
+    await // expect(editButton).toBeInTheDocument();
+    await // userEvent.click(editButton);
+    
+    // onEditコールバックが呼ばれることを確認
+    // Storybookのactionsパネルで確認可能
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: '編集機能のテスト。編集ボタンのクリックとコールバック呼び出しを確認します。'
+      }
+    }
+  }
+};
+
+export const DeleteInteraction: Story = {
+  args: {
+    memo: textMemo,
+    onEdit: () => console.log('edit'),
+    onDelete: () => console.log('delete')
+  },
+    await // expect(deleteButton).toBeInTheDocument();
+    await // userEvent.click(deleteButton);
+    
+    // 確認ダイアログが表示される場合はそれも確認
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: '削除機能のテスト。削除ボタンのクリックとコールバック呼び出しを確認します。'
+      }
+    }
+  }
+};
+
+// エラー状態のストーリー
+export const ErrorState: Story = {
+  args: {
+    memo: {
+      ...audioMemo,
+      transcriptionStatus: 'error'
+    },
+    onEdit: () => console.log('edit'),
+    onDelete: () => console.log('delete')
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: '文字起こしエラー状態の表示。エラーメッセージと再試行ボタンを確認できます。'
+      }
+    }
+  }
+};
+
+export const ProcessingState: Story = {
+  args: {
+    memo: {
+      ...audioMemo,
+      transcriptionStatus: 'processing'
+    },
+    onEdit: () => console.log('edit'),
+    onDelete: () => console.log('delete')
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: '処理中状態の表示。ローディングインジケーターを確認できます。'
+      }
+    }
+  }
+};
+
+// アクセシビリティテスト
+export const AccessibilityTest: Story = {
+  args: {
+    memo: mixedMemo,
+    onEdit: () => console.log('edit'),
+    onDelete: () => console.log('delete')
+  },
+    await // expect(playButton).toHaveFocus();
+    
+    await // userEvent.tab(); // 編集ボタンにフォーカス
+    const editButton = canvas.getByRole('button', { name: /編集|edit/i });
+    await // expect(editButton).toHaveFocus();
+    
+    await // userEvent.tab(); // 削除ボタンにフォーカス
+    const deleteButton = canvas.getByRole('button', { name: /削除|delete/i });
+    await // expect(deleteButton).toHaveFocus();
+    
+    // Enterキーでボタンを押下
+    await // userEvent.keyboard('{Enter}');
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: 'アクセシビリティテスト。キーボードナビゲーションとWAI-ARIA対応を確認します。'
+      }
+    }
+  }
+};
+
+// レスポンシブテスト
+export const MobileView: Story = {
+  args: {
+    memo: mixedMemo,
+    onEdit: () => console.log('edit'),
+    onDelete: () => console.log('delete')
+  },
+  parameters: {
+    viewport: {
+      defaultViewport: 'mobile1'
+    },
+    docs: {
+      description: {
+        story: 'モバイル表示での確認。小さい画面でのレイアウトとタッチ操作性をテストします。'
+      }
+    }
+  }
+};

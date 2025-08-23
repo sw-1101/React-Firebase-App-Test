@@ -1,10 +1,5 @@
 // ローディング表示コンポーネント
 import React from 'react'
-import { Box, CircularProgress, Typography } from '@mui/material'
-
-// Vue.js経験者向け解説:
-// - propsの受け取り方がVueとは異なる（分割代入で受け取る）
-// - コンポーネントの型定義はReact.FCまたは関数として定義
 
 interface LoadingSpinnerProps {
   message?: string
@@ -16,21 +11,17 @@ const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
   size = 40 
 }) => {
   return (
-    <Box
-      display="flex"
-      flexDirection="column"
-      alignItems="center"
-      justifyContent="center"
-      minHeight="200px"
-      gap={2}
-    >
-      <CircularProgress size={size} />
+    <div className="flex flex-col items-center justify-center min-h-48 gap-4">
+      <div 
+        className="animate-spin rounded-full border-4 border-main-light border-t-main-primary"
+        style={{ width: size, height: size }}
+      />
       {message && (
-        <Typography variant="body1" color="text.secondary">
+        <p className="text-base-text-secondary text-sm">
           {message}
-        </Typography>
+        </p>
       )}
-    </Box>
+    </div>
   )
 }
 

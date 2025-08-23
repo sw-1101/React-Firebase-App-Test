@@ -1,20 +1,10 @@
 // ログインフォームコンポーネント
 import React, { useState } from 'react'
-import {
-  Box,
-  Card,
-  CardContent,
-  TextField,
-  Button,
-  Typography,
-  Alert,
-  Link,
-  CircularProgress,
-} from '@mui/material'
 import { Link as RouterLink } from 'react-router-dom'
 import { loginUser } from '../../utils/auth'
 import { useAuth } from '../../contexts/AuthContext'
 import type { LoginCredentials } from '../../types/auth'
+import styles from './LoginForm.module.css'
 
 // Vue.js経験者向け解説:
 // - useState: Vue 3のref()やreactive()と同様のリアクティブ状態
@@ -167,66 +157,78 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess }) => {
   }
 
   return (
-    <Card sx={{ maxWidth: 400, mx: 'auto', mt: 4 }}>
-      <CardContent>
-        <Typography variant="h4" component="h1" gutterBottom align="center">
+    <div className={styles.card}>
+      <div className={styles.cardContent}>
+        <h1 className={styles.title}>
           ログイン
-        </Typography>
+        </h1>
         
         {error && (
-          <Alert severity="error" role="alert" sx={{ mb: 2 }}>
+          <div className={styles.errorAlert} role="alert">
             {error}
-          </Alert>
+          </div>
         )}
 
-        <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 2 }}>
-          <TextField
-            fullWidth
-            label="メールアドレス"
-            name="email"
-            type="email"
-            value={formData.email}
-            onChange={handleChange}
-            onBlur={handleBlur}
-            error={!!validationErrors.email}
-            helperText={validationErrors.email}
-            margin="normal"
-            autoComplete="email"
-          />
+        <form className={styles.form} onSubmit={handleSubmit} noValidate>
+          <div className={styles.fieldContainer}>
+            <label htmlFor="email" className={styles.label}>
+              メールアドレス
+            </label>
+            <input
+              id="email"
+              className={`${styles.input} ${validationErrors.email ? styles.error : ''}`}
+              name="email"
+              type="email"
+              value={formData.email}
+              onChange={handleChange}
+              onBlur={handleBlur}
+              autoComplete="email"
+            />
+            {validationErrors.email && (
+              <div className={`${styles.helperText} ${styles.error}`}>
+                {validationErrors.email}
+              </div>
+            )}
+          </div>
           
-          <TextField
-            fullWidth
-            label="パスワード"
-            name="password"
-            type="password"
-            value={formData.password}
-            onChange={handleChange}
-            onBlur={handleBlur}
-            error={!!validationErrors.password}
-            helperText={validationErrors.password}
-            margin="normal"
-            autoComplete="current-password"
-          />
+          <div className={styles.fieldContainer}>
+            <label htmlFor="password" className={styles.label}>
+              パスワード
+            </label>
+            <input
+              id="password"
+              className={`${styles.input} ${validationErrors.password ? styles.error : ''}`}
+              name="password"
+              type="password"
+              value={formData.password}
+              onChange={handleChange}
+              onBlur={handleBlur}
+              autoComplete="current-password"
+            />
+            {validationErrors.password && (
+              <div className={`${styles.helperText} ${styles.error}`}>
+                {validationErrors.password}
+              </div>
+            )}
+          </div>
           
-          <Button
+          <button
             type="submit"
-            fullWidth
-            variant="contained"
-            sx={{ mt: 3, mb: 2 }}
+            className={styles.submitButton}
             disabled={loading}
           >
-            {loading && <CircularProgress size={20} sx={{ mr: 1 }} role="progressbar" />}
+            {loading && <div className={styles.submitSpinner} role="progressbar" />}
             {loading ? 'ログイン中...' : 'ログイン'}
-          </Button>
+          </button>
 
-          <Box sx={{ textAlign: 'center', mt: 2 }}>
-            <Link component={RouterLink} to="/register" variant="body2">
+          <div className={styles.linkContainer}>
+            <RouterLink to="/register" className={styles.link}>
               新規登録はこちら
-            </Link>
-          </Box>
-        </Box>
-      </CardContent>
-    </Card>
+            </RouterLink>
+          </div>
+        </form>
+      </div>
+    </div>
   )
 }
 

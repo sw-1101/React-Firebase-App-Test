@@ -1,10 +1,12 @@
 // エラーメッセージ表示コンポーネント
 import React from 'react'
-import { Alert, AlertTitle, Box } from '@mui/material'
+import { CloseIcon } from '@/components/icons/CustomIcons'
+import styles from './ErrorMessage.module.css'
 
-// Vue.js経験者向け解説:
-// - MUIのAlertコンポーネントはVuetifyのv-alertと同様の役割
-// - オプションプロパティは?マークで表現（VueのOptionalと同じ）
+// カスタムCSS + CSS Modules実装
+// - 各セベリティレベルに対応したスタイル定義
+// - クローズ機能付きアラート
+// - アクセシビリティ対応
 
 interface ErrorMessageProps {
   title?: string
@@ -20,16 +22,23 @@ const ErrorMessage: React.FC<ErrorMessageProps> = ({
   onClose
 }) => {
   return (
-    <Box sx={{ width: '100%', mt: 2 }}>
-      <Alert 
-        severity={severity}
-        onClose={onClose}
-        variant="filled"
-      >
-        {title && <AlertTitle>{title}</AlertTitle>}
-        {message}
-      </Alert>
-    </Box>
+    <div className={styles.container}>
+      <div className={`${styles.alert} ${styles[severity]}`}>
+        <div className={styles.alertContent}>
+          {title && <div className={styles.alertTitle}>{title}</div>}
+          <div>{message}</div>
+        </div>
+        {onClose && (
+          <button
+            className={styles.closeButton}
+            onClick={onClose}
+            aria-label="閉じる"
+          >
+            <CloseIcon className={styles.closeIcon} />
+          </button>
+        )}
+      </div>
+    </div>
   )
 }
 

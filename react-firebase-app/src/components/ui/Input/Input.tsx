@@ -64,24 +64,35 @@ const Input: React.FC<InputProps> = ({
     className
   );
 
-  const InputComponent = autoResize ? 'textarea' : 'input';
-
   return (
     <motion.div className={styles.container}>
-      <InputComponent
-        ref={autoResize ? textareaRef : inputRef}
-        className={inputClasses}
-        value={value}
-        onChange={handleChange}
-        placeholder={placeholder}
-        disabled={disabled}
-        onFocus={onFocus}
-        onBlur={onBlur}
-        onKeyDown={onKeyDown}
-        aria-label={ariaLabel}
-        rows={autoResize ? 1 : undefined}
-        style={{ resize: autoResize ? 'none' : undefined }}
-      />
+      {autoResize ? (
+        <textarea
+          ref={textareaRef}
+          className={inputClasses}
+          value={value}
+          onChange={handleChange}
+          placeholder={placeholder}
+          disabled={disabled}
+          onFocus={onFocus}
+          onBlur={onBlur}
+          onKeyDown={onKeyDown}
+          aria-label={ariaLabel}
+        />
+      ) : (
+        <input
+          ref={inputRef}
+          className={inputClasses}
+          value={value}
+          onChange={handleChange}
+          placeholder={placeholder}
+          disabled={disabled}
+          onFocus={onFocus}
+          onBlur={onBlur}
+          onKeyDown={onKeyDown}
+          aria-label={ariaLabel}
+        />
+      )}
       
       {error && (
         <motion.div

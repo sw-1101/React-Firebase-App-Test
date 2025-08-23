@@ -1,29 +1,7 @@
 import React from 'react';
-import {
-  Card,
-  CardContent,
-  Typography,
-  IconButton,
-  Box,
-  Chip,
-  Menu,
-  MenuItem,
-  ListItemIcon,
-  ListItemText
-} from '@mui/material';
-import {
-  PlayArrow,
-  Pause,
-  Delete,
-  Edit,
-  Share,
-  MoreVert,
-  VolumeUp,
-  VolumeOff,
-  TextFields,
-  MicNone
-} from '@mui/icons-material';
+import classNames from 'classnames';
 import { type Memo, hasAudio, hasText } from '@/types/memo';
+import styles from './MemoCard.module.css';
 
 /**
  * メモカードコンポーネント
@@ -69,6 +47,7 @@ export const MemoCard: React.FC<MemoCardProps> = ({
 }) => {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const menuOpen = Boolean(anchorEl);
+  const menuRef = React.useRef<HTMLDivElement>(null);
 
   // メニューの開閉
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
@@ -79,6 +58,20 @@ export const MemoCard: React.FC<MemoCardProps> = ({
   const handleMenuClose = () => {
     setAnchorEl(null);
   };
+
+  // ドキュメントクリックでメニューを閉じる
+  React.useEffect(() => {
+    if (!menuOpen) return;
+
+    const handleDocumentClick = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        handleMenuClose();
+      }
+    };
+
+    document.addEventListener('mousedown', handleDocumentClick);
+    return () => document.removeEventListener('mousedown', handleDocumentClick);
+  }, [menuOpen]);
 
   // 時間フォーマット
   const formatTime = (timestamp: Date): string => {
@@ -114,8 +107,9 @@ export const MemoCard: React.FC<MemoCardProps> = ({
 
   // 再生進捗
   const getPlayProgress = (): number => {
+    if (!hasAudio(memo)) return 0;
     const duration = actualDuration || memo.duration;
-    if (!hasAudio(memo) || !duration || duration === 0 || !isFinite(duration)) return 0;
+    if (!duration || duration === 0 || !isFinite(duration)) return 0;
     if (!currentTime || !isFinite(currentTime)) return 0;
     return Math.min((currentTime / duration) * 100, 100);
   };
@@ -124,15 +118,15 @@ export const MemoCard: React.FC<MemoCardProps> = ({
   const getTypeIcon = () => {
     switch (memo.type) {
       case 'audio':
-        return <MicNone fontSize="small" />;
+        return <span className={styles.typeIcon}>🎤</span>;
       case 'text':
-        return <TextFields fontSize="small" />;
+        return <span className={styles.typeIcon}>📝</span>;
       case 'mixed':
         return (
-          <Box sx={{ display: 'flex', gap: 0.5 }}>
-            <MicNone fontSize="small" />
-            <TextFields fontSize="small" />
-          </Box>
+          <div className={styles.typeIconMixed}>
+            <span className={styles.typeIcon}>🎤</span>
+            <span className={styles.typeIcon}>📝</span>
+          </div>
         );
       default:
         return null;
@@ -186,52 +180,26 @@ export const MemoCard: React.FC<MemoCardProps> = ({
   };
 
   return (
-    <Card
-      sx={{
-        width: '100%',
-        mb: 1,
-        boxShadow: 1,
-        '&:hover': {
-          boxShadow: 3,
-          transform: 'translateY(-1px)'
-        },
-        transition: 'all 0.2s ease-in-out',
-        border: isPlaying ? '2px solid' : '1px solid',
-        borderColor: isPlaying ? 'primary.main' : 'divider'
-      }}
+    <article 
+      className={classNames(
+        styles.card,
+        { [styles.cardPlaying]: isPlaying }
+      )}
       role="article"
       aria-label={`メモ: ${getTitle()}`}
     >
-      <CardContent sx={{ pb: 1, '&:last-child': { pb: 1 } }}>
+      <div className={styles.cardContent}>
         {/* ヘッダー行 */}
-        <Box
-          sx={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'flex-start',
-            mb: 1
-          }}
-        >
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flex: 1 }}>
+        <div className={styles.header}>
+          <div className={styles.headerLeft}>
             {getTypeIcon()}
-            <Typography
-              variant="subtitle2"
-              sx={{
-                fontWeight: 600,
-                color: 'text.primary',
-                flex: 1,
-                minWidth: 0,
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap'
-              }}
-            >
+            <h3 className={styles.title}>
               {getTitle()}
-            </Typography>
-          </Box>
+            </h3>
+          </div>
           
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <Typography variant="caption" color="text.secondary">
+          <div className={styles.headerRight}>
+            <span className={styles.timestamp}>
               {formatTime(
                 memo.createdAt && typeof memo.createdAt.toDate === 'function'
                   ? memo.createdAt.toDate()
@@ -239,196 +207,162 @@ export const MemoCard: React.FC<MemoCardProps> = ({
                   ? memo.createdAt
                   : new Date()
               )}
-            </Typography>
+            </span>
             
-            <IconButton
-              size="small"
-              onClick={handleMenuOpen}
-              aria-label="メニューを開く"
-              aria-expanded={menuOpen}
-              aria-haspopup="true"
-            >
-              <MoreVert fontSize="small" />
-            </IconButton>
-          </Box>
-        </Box>
+            <div style={{ position: 'relative', display: 'inline-block' }}>
+              <button
+                className={styles.menuButton}
+                onClick={handleMenuOpen}
+                aria-label="メニューを開く"
+                aria-expanded={menuOpen}
+                aria-haspopup="true"
+                type="button"
+              >
+                ⋮
+              </button>
+              
+              {/* メニュー */}
+              {menuOpen && (
+                  <div 
+                    ref={menuRef}
+                    className={styles.menu}
+                    style={{
+                      position: 'absolute',
+                      top: '100%',
+                      right: '0',
+                      marginTop: '4px',
+                      zIndex: 50
+                    }}
+                  >
+                    {onEdit && (
+                      <button 
+                        className={styles.menuItem}
+                        onClick={() => { onEdit(); handleMenuClose(); }}
+                        type="button"
+                      >
+                        <span className={styles.menuItemIcon}>✏️</span>
+                        編集
+                      </button>
+                    )}
+                    
+                    {onShare && (
+                      <button 
+                        className={styles.menuItem}
+                        onClick={() => { onShare(); handleMenuClose(); }}
+                        type="button"
+                      >
+                        <span className={styles.menuItemIcon}>📤</span>
+                        共有
+                      </button>
+                    )}
+                    
+                    <button
+                      className={classNames(styles.menuItem, styles.menuItemDanger)}
+                      onClick={() => { onDelete(); handleMenuClose(); }}
+                      type="button"
+                    >
+                      <span className={styles.menuItemIcon}>🗑</span>
+                      削除
+                    </button>
+                  </div>
+              )}
+            </div>
+          </div>
+        </div>
 
-        {/* メニュー */}
-        <Menu
-          anchorEl={anchorEl}
-          open={menuOpen}
-          onClose={handleMenuClose}
-          onClick={handleMenuClose}
-          transformOrigin={{ horizontal: 'right', vertical: 'top' }}
-          anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
-        >
-          {onEdit && (
-            <MenuItem onClick={() => { onEdit(); handleMenuClose(); }}>
-              <ListItemIcon>
-                <Edit fontSize="small" />
-              </ListItemIcon>
-              <ListItemText>編集</ListItemText>
-            </MenuItem>
-          )}
-          
-          {onShare && (
-            <MenuItem onClick={() => { onShare(); handleMenuClose(); }}>
-              <ListItemIcon>
-                <Share fontSize="small" />
-              </ListItemIcon>
-              <ListItemText>共有</ListItemText>
-            </MenuItem>
-          )}
-          
-          <MenuItem
-            onClick={() => { onDelete(); handleMenuClose(); }}
-            sx={{ color: 'error.main' }}
-          >
-            <ListItemIcon>
-              <Delete fontSize="small" sx={{ color: 'error.main' }} />
-            </ListItemIcon>
-            <ListItemText>削除</ListItemText>
-          </MenuItem>
-        </Menu>
 
         {/* 内容プレビュー */}
-        <Typography
-          variant="body2"
-          sx={{
-            mb: 2,
-            color: 'text.secondary',
-            display: '-webkit-box',
-            WebkitLineClamp: memo.type === 'mixed' ? 5 : 3, // 混合モードでは行数を増やす
-            WebkitBoxOrient: 'vertical',
-            overflow: 'hidden',
-            lineHeight: 1.4,
-            whiteSpace: 'pre-line' // 改行を表示
-          }}
+        <div 
+          className={classNames(
+            styles.contentPreview,
+            memo.type === 'mixed' ? styles.contentPreviewMixed : styles.contentPreviewNormal
+          )}
         >
           {getContentPreview()}
-        </Typography>
+        </div>
 
         {/* 音声コントロール */}
         {hasAudio(memo) && (
-          <Box sx={{ mb: 1 }}>
+          <div className={styles.audioControls}>
             {/* 再生プログレスバー */}
-            <Box
-              sx={{
-                width: '100%',
-                height: 4,
-                bgcolor: 'grey.300',
-                borderRadius: 2,
-                mb: 1,
-                overflow: 'hidden'
-              }}
-            >
-              <Box
-                sx={{
-                  width: `${getPlayProgress()}%`,
-                  height: '100%',
-                  bgcolor: 'primary.main',
-                  borderRadius: 2,
-                  transition: 'width 0.1s ease-out'
-                }}
-              />
-            </Box>
+            <div className={styles.progressContainer}>
+              <div className={styles.progressBar}>
+                <div 
+                  className={styles.progressFill}
+                  style={{ width: `${getPlayProgress()}%` }}
+                />
+              </div>
+            </div>
 
-            <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between'
-              }}
-            >
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <IconButton
+            <div className={styles.audioControls}>
+              <div className={styles.audioLeft}>
+                <button
                   onClick={isPlaying ? onPause : onPlay}
-                  size="small"
-                  sx={{
-                    bgcolor: isPlaying ? 'secondary.main' : 'primary.main',
-                    color: 'white',
-                    '&:hover': {
-                      bgcolor: isPlaying ? 'secondary.dark' : 'primary.dark'
-                    }
-                  }}
+                  className={classNames(
+                    styles.playButton,
+                    isPlaying ? styles.playButtonPause : styles.playButtonPlay
+                  )}
                   aria-label={isPlaying ? '再生を停止' : '音声を再生'}
+                  type="button"
                 >
-                  {isPlaying ? <Pause /> : <PlayArrow />}
-                </IconButton>
+                  {isPlaying ? '⏸' : '▶'}
+                </button>
 
-                <Typography variant="caption" color="text.secondary">
+                <span className={styles.duration}>
                   {formatDuration(currentTime)} / {formatDuration(actualDuration || memo.duration)}
-                </Typography>
-              </Box>
+                </span>
+              </div>
 
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <div className={styles.audioRight}>
                 {/* 文字起こし状態 */}
                 {memo.transcriptionStatus && (
-                  <Chip
-                    label={
+                  <span className={classNames(
+                    styles.chip,
+                    memo.transcriptionStatus === 'completed' ? styles.chipSuccess :
+                    memo.transcriptionStatus === 'processing' ? styles.chipPrimary :
+                    memo.transcriptionStatus === 'failed' ? styles.chipError :
+                    styles.chipDefault
+                  )}>
+                    {
                       memo.transcriptionStatus === 'completed'
                         ? '文字起こし完了'
                         : memo.transcriptionStatus === 'processing'
                         ? '処理中'
                         : memo.transcriptionStatus === 'failed'
                         ? 'エラー'
-                        : '待機中'
+                        : hasAudio(memo)
+                        ? '音声メモ'
+                        : 'テキストメモ'
                     }
-                    size="small"
-                    color={
-                      memo.transcriptionStatus === 'completed'
-                        ? 'success'
-                        : memo.transcriptionStatus === 'processing'
-                        ? 'primary'
-                        : memo.transcriptionStatus === 'failed'
-                        ? 'error'
-                        : 'default'
-                    }
-                    variant="outlined"
-                  />
+                  </span>
                 )}
 
                 {/* 音声アイコン */}
-                <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                  {isPlaying ? <VolumeUp fontSize="small" /> : <VolumeOff fontSize="small" />}
-                </Box>
-              </Box>
-            </Box>
-          </Box>
+                <span className={styles.volumeIcon}>
+                  {isPlaying ? '🔊' : '🔇'}
+                </span>
+              </div>
+            </div>
+          </div>
         )}
 
         {/* フッター情報 */}
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            pt: 1,
-            borderTop: '1px solid',
-            borderColor: 'divider'
-          }}
-        >
-          <Box sx={{ display: 'flex', gap: 1 }}>
+        <div className={styles.footer}>
+          <div className={styles.footerLeft}>
             {/* ファイルサイズ */}
             {hasAudio(memo) && memo.fileSize && (
-              <Chip
-                label={`${Math.round(memo.fileSize / 1024)}KB`}
-                size="small"
-                variant="outlined"
-                sx={{ fontSize: '0.7rem' }}
-              />
+              <span className={classNames(styles.chip, styles.chipSmall, styles.chipDefault)}>
+                {Math.round(memo.fileSize / 1024)}KB
+              </span>
             )}
 
             {/* 文字数 */}
             {hasText(memo) && memo.textContent && (
-              <Chip
-                label={`${memo.textContent.length}文字`}
-                size="small"
-                variant="outlined"
-                sx={{ fontSize: '0.7rem' }}
-              />
+              <span className={classNames(styles.chip, styles.chipSmall, styles.chipDefault)}>
+                {memo.textContent.length}文字
+              </span>
             )}
-          </Box>
+          </div>
 
           {/* 更新日時 */}
           {memo.updatedAt && memo.createdAt && (
@@ -452,17 +386,17 @@ export const MemoCard: React.FC<MemoCardProps> = ({
                   : new Date();
                 
                 return (
-                  <Typography variant="caption" color="text.disabled">
+                  <div className={styles.footerRight}>
                     編集: {formatTime(updatedDate)}
-                  </Typography>
+                  </div>
                 );
               }
               return null;
             })()
           )}
-        </Box>
-      </CardContent>
-    </Card>
+        </div>
+      </div>
+    </article>
   );
 };
 

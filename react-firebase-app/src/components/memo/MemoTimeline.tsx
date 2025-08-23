@@ -1,21 +1,12 @@
 import React, { useCallback, useMemo, useRef } from 'react';
-import {
-  List,
-  ListItem,
-  Typography,
-  Box,
-  Divider,
-  Skeleton,
-  Button,
-  Alert,
-  Fade
-} from '@mui/material';
+import classNames from 'classnames';
+
 import { FixedSizeList as VirtualList } from 'react-window';
 // @ts-ignore
 import InfiniteLoader from 'react-window-infinite-loader';
 import { MemoCard } from './MemoCard';
 import { type Memo } from '@/types/memo';
-import { Refresh, ErrorOutline } from '@mui/icons-material';
+import styles from './MemoTimeline.module.css';
 
 /**
  * メモタイムラインコンポーネント
@@ -189,7 +180,7 @@ export const MemoTimeline: React.FC<MemoTimelineProps> = ({
     if (!item) {
       return (
         <div style={style}>
-          <Skeleton variant="rectangular" height={100} sx={{ mx: 1, mb: 1 }} />
+          <div className={classNames(styles.skeleton, styles.skeletonLarge)} />
         </div>
       );
     }
@@ -197,21 +188,15 @@ export const MemoTimeline: React.FC<MemoTimelineProps> = ({
     return (
       <div style={style}>
         {item.type === 'header' && (
-          <Box sx={{ px: 2, py: 1, bgcolor: 'grey.50' }}>
-            <Typography
-              variant="subtitle1"
-              sx={{
-                color: 'text.secondary',
-                fontWeight: 'bold'
-              }}
-            >
+          <div className={styles.listItemHeader}>
+            <h3 className={styles.dateHeader}>
               {item.date}
-            </Typography>
-          </Box>
+            </h3>
+          </div>
         )}
 
         {item.type === 'memo' && item.data && (
-          <Box sx={{ px: 1 }}>
+          <div className={styles.listItemMemo}>
             <MemoCard
               memo={item.data}
               isPlaying={currentlyPlaying === item.data.id}
@@ -227,13 +212,13 @@ export const MemoTimeline: React.FC<MemoTimelineProps> = ({
               onEdit={onEditMemo ? () => onEditMemo(item.data!.id) : undefined}
               onShare={onShareMemo ? () => onShareMemo(item.data!.id) : undefined}
             />
-          </Box>
+          </div>
         )}
 
         {item.type === 'loading' && (
-          <Box sx={{ p: 2, display: 'flex', justifyContent: 'center' }}>
-            <Skeleton variant="rectangular" width="100%" height={80} />
-          </Box>
+          <div className={styles.listItemLoading}>
+            <div className={classNames(styles.skeleton, styles.skeletonSmall)} />
+          </div>
         )}
       </div>
     );
@@ -241,25 +226,19 @@ export const MemoTimeline: React.FC<MemoTimelineProps> = ({
 
   // 通常スクロール用のレンダリング
   const renderNormalScroll = () => (
-    <List sx={{ width: '100%', bgcolor: 'background.paper' }}>
+    <div className={styles.list}>
       {timelineItems.map((item, index) => (
         <React.Fragment key={item.id}>
           {item.type === 'header' && (
-            <ListItem sx={{ px: 2, py: 1, bgcolor: 'grey.50' }}>
-              <Typography
-                variant="subtitle1"
-                sx={{
-                  color: 'text.secondary',
-                  fontWeight: 'bold'
-                }}
-              >
+            <div className={styles.listItemHeader}>
+              <h3 className={styles.dateHeader}>
                 {item.date}
-              </Typography>
-            </ListItem>
+              </h3>
+            </div>
           )}
 
           {item.type === 'memo' && item.data && (
-            <ListItem sx={{ px: 1, pb: 0 }}>
+            <div className={styles.listItemMemo}>
               <MemoCard
                 memo={item.data}
                 isPlaying={currentlyPlaying === item.data.id}
@@ -275,83 +254,68 @@ export const MemoTimeline: React.FC<MemoTimelineProps> = ({
                 onEdit={onEditMemo ? () => onEditMemo(item.data!.id) : undefined}
                 onShare={onShareMemo ? () => onShareMemo(item.data!.id) : undefined}
               />
-            </ListItem>
+            </div>
           )}
 
           {item.type === 'loading' && (
-            <ListItem>
-              <Skeleton variant="rectangular" width="100%" height={80} />
-            </ListItem>
+            <div className={styles.listItem}>
+              <div className={classNames(styles.skeleton, styles.skeletonSmall)} />
+            </div>
           )}
 
           {index < timelineItems.length - 1 && timelineItems[index + 1].type === 'header' && (
-            <Divider sx={{ my: 1 }} />
+            <hr className={styles.divider} />
           )}
         </React.Fragment>
       ))}
-    </List>
+    </div>
   );
 
   // エラー状態の表示
   if (error) {
     return (
-      <Fade in={true}>
-        <Box sx={{ p: 3, textAlign: 'center' }}>
-          <Alert
-            severity="error"
-            icon={<ErrorOutline />}
-            action={
-              onRefresh && (
-                <Button
-                  color="inherit"
-                  size="small"
-                  onClick={onRefresh}
-                  startIcon={<Refresh />}
-                >
-                  再読み込み
-                </Button>
-              )
-            }
-          >
-            <Typography variant="body2">
-              {error}
-            </Typography>
-          </Alert>
-        </Box>
-      </Fade>
+      <div className={styles.errorContainer}>
+        <div className={styles.errorAlert}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span>⚠️</span>
+            <div className={styles.errorText}>{error}</div>
+          </div>
+          {onRefresh && (
+            <button
+              className={styles.errorButton}
+              onClick={onRefresh}
+              type="button"
+            >
+              <span>🔄</span>
+              再読み込み
+            </button>
+          )}
+        </div>
+      </div>
     );
   }
 
   // 空状態の表示
   if (!loading && memos.length === 0) {
     return (
-      <Fade in={true}>
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            height: 400,
-            textAlign: 'center',
-            color: 'text.secondary'
-          }}
-        >
-          <Typography variant="h6" sx={{ mb: 1 }}>
-            📝 メモがありません
-          </Typography>
-          <Typography variant="body2">
-            🎤ボタンを押して最初のメモを作成しましょう
-          </Typography>
-        </Box>
-      </Fade>
+      <div className={styles.emptyContainer}>
+        <h2 className={styles.emptyTitle}>
+          📝 メモがありません
+        </h2>
+        <p className={styles.emptyDescription}>
+          🎤ボタンを押して最初のメモを作成しましょう
+        </p>
+      </div>
     );
   }
 
   // 仮想スクロールの場合
   if (useVirtualScroll && timelineItems.length > 20) {
     return (
-      <Box sx={{ height, width: '100%' }}>
+      <div 
+        className={styles.containerVirtual}
+        style={{ '--timeline-height': `${height}px` } as React.CSSProperties}
+      >
         <InfiniteLoader
           ref={infiniteLoaderRef}
           isItemLoaded={isItemLoaded}
@@ -372,14 +336,18 @@ export const MemoTimeline: React.FC<MemoTimelineProps> = ({
             </VirtualList>
           )}
         </InfiniteLoader>
-      </Box>
+      </div>
     );
   }
 
   // 通常スクロールの場合
   return (
-    <Box
-      sx={{
+    <div 
+      className={classNames(
+        styles.container,
+        { [styles.containerVirtual]: useVirtualScroll }
+      )}
+      style={{ 
         height: useVirtualScroll ? height : 'auto',
         overflowY: useVirtualScroll ? 'hidden' : 'auto'
       }}
@@ -388,27 +356,29 @@ export const MemoTimeline: React.FC<MemoTimelineProps> = ({
       
       {/* 追加読み込みボタン */}
       {hasMore && !loading && (
-        <Box sx={{ display: 'flex', justifyContent: 'center', p: 2 }}>
-          <Button variant="outlined" onClick={onLoadMore}>
+        <div className={styles.loadMoreContainer}>
+          <button 
+            className={styles.loadMoreButton}
+            onClick={onLoadMore}
+            type="button"
+          >
             さらに読み込む
-          </Button>
-        </Box>
+          </button>
+        </div>
       )}
       
       {/* ローディング表示 */}
       {loading && (
-        <Box sx={{ p: 2 }}>
+        <div className={styles.loadingContainer}>
           {Array.from({ length: 3 }).map((_, index) => (
-            <Skeleton
+            <div
               key={index}
-              variant="rectangular"
-              height={100}
-              sx={{ mb: 1 }}
+              className={classNames(styles.skeleton, styles.skeletonLarge)}
             />
           ))}
-        </Box>
+        </div>
       )}
-    </Box>
+    </div>
   );
 };
 

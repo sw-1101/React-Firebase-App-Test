@@ -1,7 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import classNames from 'classnames';
-import { Button } from '../../ui';
 import styles from './Header.module.css';
 
 export interface HeaderProps {

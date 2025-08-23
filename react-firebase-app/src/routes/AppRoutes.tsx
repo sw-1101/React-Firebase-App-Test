@@ -5,11 +5,9 @@ import { PrivateRoute } from '../components/auth'
 import { 
   LoginPage, 
   RegisterPage, 
-  DashboardPage, 
+  MenuPage, 
   ProfilePage, 
-  DataPage 
 } from '../pages'
-import ContentPage from '../pages/ContentPage'
 import MemoListPage from '../pages/MemoListPage'
 
 // Vue.js経験者向け解説:
@@ -27,10 +25,10 @@ const AppRoutes: React.FC = () => {
       
       {/* プライベートルート（認証必要） */}
       <Route
-        path="/dashboard"
+        path="/menu"
         element={
           <PrivateRoute>
-            <DashboardPage />
+            <MenuPage />
           </PrivateRoute>
         }
       />
@@ -39,22 +37,6 @@ const AppRoutes: React.FC = () => {
         element={
           <PrivateRoute>
             <ProfilePage />
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="/data"
-        element={
-          <PrivateRoute>
-            <DataPage />
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="/content"
-        element={
-          <PrivateRoute>
-            <ContentPage />
           </PrivateRoute>
         }
       />
@@ -68,7 +50,7 @@ const AppRoutes: React.FC = () => {
       />
       
       {/* デフォルトルート */}
-      <Route path="/" element={<Navigate to="/dashboard" replace />} />
+      <Route path="/" element={<Navigate to="/menu" replace />} />
       
       {/* 404ページ（該当するルートがない場合） */}
       <Route path="*" element={<Navigate to="/login" replace />} />

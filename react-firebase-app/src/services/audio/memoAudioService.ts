@@ -1,5 +1,5 @@
 import { transcriptionService, type TranscriptionResult, type TranscriptionOptions, type UploadProgress } from './transcriptionService';
-import { firestoreService } from '@/services/firebase';
+import { firestoreService, authService } from '@/services/firebase';
 import { Timestamp } from 'firebase/firestore';
 import { type CreateMemoData, type UpdateMemoData } from '@/types/memo';
 
@@ -400,7 +400,7 @@ class MemoAudioService {
    * Blobから音声の長さを取得（特別な処理）
    */
   private async getAudioDurationFromBlob(audioBlob: Blob): Promise<number> {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       // 一時的なaudio要素を作成
       const audio = document.createElement('audio');
       const url = URL.createObjectURL(audioBlob);

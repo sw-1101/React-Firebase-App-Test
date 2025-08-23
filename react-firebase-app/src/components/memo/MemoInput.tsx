@@ -1,32 +1,11 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
-import {
-  Box,
-  TextField,
-  IconButton,
-  Button,
-  Paper,
-  Typography,
-  Fade,
-  CircularProgress,
-  Alert,
-  Tooltip,
-  LinearProgress,
-  Stepper,
-  Step,
-  StepLabel
-} from '@mui/material';
-import {
-  Send,
-  Mic,
-  MicOff,
-  Clear,
-  TextFields
-} from '@mui/icons-material';
 import { useMemos } from '@/contexts/MemoContext';
 import { type CreateMemoData } from '@/types/memo';
 import { memoAudioService, type AudioProcessingProgress } from '@/services/audio/memoAudioService';
-import { useTrophyNotification } from '@/components/feedback/TrophyNotification';
+// import { useTrophyNotification } from '@/components/feedback/TrophyNotification';
 import { authService } from '@/services/firebase/auth';
+import { SendIcon, MicIcon, MicOffIcon, ClearIcon, TextFieldsIcon, CloseIcon } from '@/components/icons/CustomIcons';
+import styles from './MemoInput.module.css';
 
 /**
  * メモ入力コンポーネント
@@ -62,7 +41,7 @@ export const MemoInput: React.FC<MemoInputProps> = ({
   onModeChange
 }) => {
   const { createMemo } = useMemos();
-  const { showSuccessNotification } = useTrophyNotification();
+  // const { // showSuccessNotification } = useTrophyNotification();
   
   // フォーム状態
   const [text, setText] = useState('');
@@ -78,7 +57,7 @@ export const MemoInput: React.FC<MemoInputProps> = ({
   const [recordingTime, setRecordingTime] = useState(0);
   
   // Refs
-  const textFieldRef = useRef<HTMLInputElement>(null);
+  const textFieldRef = useRef<HTMLTextAreaElement>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const recordingTimerRef = useRef<NodeJS.Timeout | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
@@ -119,7 +98,7 @@ export const MemoInput: React.FC<MemoInputProps> = ({
   };
 
   // テキスト変更処理
-  const handleTextChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleTextChange = useCallback((event: React.ChangeEvent<HTMLTextAreaElement>) => {
     const value = event.target.value;
     if (value.length <= maxLength) {
       setText(value);
@@ -251,10 +230,10 @@ export const MemoInput: React.FC<MemoInputProps> = ({
       }
       
       // 成功通知
-      showSuccessNotification(
-        'メモが作成されました！',
-        currentMode === 'audio' ? '音声の文字起こしも完了しました' : 'テキストメモが保存されました'
-      );
+      // showSuccessNotification(
+      //   'メモが作成されました！',
+      //   currentMode === 'audio' ? '音声の文字起こしも完了しました' : 'テキストメモが保存されました'
+      // );
       
       // フォームリセット
       setText('');
@@ -277,7 +256,7 @@ export const MemoInput: React.FC<MemoInputProps> = ({
     } finally {
       setIsSubmitting(false);
     }
-  }, [validateInput, currentMode, text, audioBlob, createMemo, memoAudioService, showSuccessNotification, clearAudio, onSubmitSuccess, onSubmitError]);
+  }, [validateInput, currentMode, text, audioBlob, createMemo, memoAudioService, clearAudio, onSubmitSuccess, onSubmitError]);
 
   // Enterキーでの送信
   const handleKeyPress = useCallback((event: React.KeyboardEvent) => {
@@ -295,224 +274,200 @@ export const MemoInput: React.FC<MemoInputProps> = ({
   );
 
   return (
-    <Paper
-      elevation={3}
-      sx={{
-        position: 'sticky',
-        bottom: 0,
-        left: 0,
-        right: 0,
-        zIndex: 1000,
-        bgcolor: 'background.paper',
-        borderTop: '1px solid',
-        borderColor: 'divider'
-      }}
-    >
-      <Box sx={{ p: 2 }}>
+    <div className={styles.container}>
+      <div className={styles.content}>
         {/* モード選択 */}
-        <Box sx={{ display: 'flex', gap: 1, mb: 2, justifyContent: 'center' }}>
-          <Tooltip title="テキストメモ">
-            <IconButton
-              onClick={() => handleModeChange('text')}
-              color={currentMode === 'text' ? 'primary' : 'default'}
-              size="small"
-              disabled={isSubmitting || isRecording}
-            >
-              <TextFields />
-            </IconButton>
-          </Tooltip>
+        <div className={styles.modeSelector}>
+          <button
+            className={`${styles.modeButton} ${currentMode === 'text' ? styles.active : ''}`}
+            onClick={() => handleModeChange('text')}
+            disabled={isSubmitting || isRecording}
+            title="テキストメモ"
+          >
+            <TextFieldsIcon className={styles.icon} />
+          </button>
           
-          <Tooltip title="音声メモ">
-            <IconButton
-              onClick={() => handleModeChange('audio')}
-              color={currentMode === 'audio' ? 'primary' : 'default'}
-              size="small"
-              disabled={isSubmitting}
-            >
-              <Mic />
-            </IconButton>
-          </Tooltip>
+          <button
+            className={`${styles.modeButton} ${currentMode === 'audio' ? styles.active : ''}`}
+            onClick={() => handleModeChange('audio')}
+            disabled={isSubmitting}
+            title="音声メモ"
+          >
+            <MicIcon className={styles.icon} />
+          </button>
           
-          <Tooltip title="テキスト＋音声メモ">
-            <IconButton
-              onClick={() => handleModeChange('mixed')}
-              color={currentMode === 'mixed' ? 'primary' : 'default'}
-              size="small"
-              disabled={isSubmitting || isRecording}
-            >
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                <TextFields fontSize="small" />
-                <Mic fontSize="small" />
-              </Box>
-            </IconButton>
-          </Tooltip>
-        </Box>
+          <button
+            className={`${styles.modeButton} ${currentMode === 'mixed' ? styles.active : ''}`}
+            onClick={() => handleModeChange('mixed')}
+            disabled={isSubmitting || isRecording}
+            title="テキスト＋音声メモ"
+          >
+            <div className={styles.modeButtonMixed}>
+              <TextFieldsIcon className={styles.iconSmall} />
+              <MicIcon className={styles.iconSmall} />
+            </div>
+          </button>
+        </div>
 
         {/* エラー表示 */}
         {error && (
-          <Fade in={true}>
-            <Alert severity="error" sx={{ mb: 2 }} onClose={() => setError(null)}>
-              {error}
-            </Alert>
-          </Fade>
+          <div className={styles.errorAlert}>
+            {error}
+            <button 
+              className={styles.errorClose}
+              onClick={() => setError(null)}
+            >
+              <CloseIcon className={styles.iconSmall} />
+            </button>
+          </div>
         )}
 
         {/* 処理進捗表示 */}
         {processingProgress && (
-          <Fade in={true}>
-            <Box sx={{ mb: 2, p: 2, bgcolor: 'background.default', borderRadius: 1 }}>
-              <Typography variant="subtitle2" gutterBottom>
-                {processingProgress.message}
-              </Typography>
-              
-              <LinearProgress 
-                variant="determinate" 
-                value={processingProgress.progress} 
-                sx={{ mb: 1 }}
+          <div className={styles.progressContainer}>
+            <div className={styles.progressTitle}>
+              {processingProgress.message}
+            </div>
+            
+            <div className={styles.progressBar}>
+              <div 
+                className={styles.progressBarFill}
+                style={{ width: `${processingProgress.progress}%` }}
               />
-              
-              <Stepper activeStep={
-                processingProgress.stage === 'uploading' ? 0 :
-                processingProgress.stage === 'transcribing' ? 1 :
-                processingProgress.stage === 'saving' ? 2 :
-                processingProgress.stage === 'complete' ? 3 : 0
-              } alternativeLabel>
-                <Step>
-                  <StepLabel>アップロード</StepLabel>
-                </Step>
-                <Step>
-                  <StepLabel>文字起こし</StepLabel>
-                </Step>
-                <Step>
-                  <StepLabel>保存</StepLabel>
-                </Step>
-                <Step>
-                  <StepLabel>完了</StepLabel>
-                </Step>
-              </Stepper>
-              
-              {processingProgress.transcriptionResult && (
-                <Box sx={{ mt: 2, p: 1, bgcolor: 'success.light', borderRadius: 1 }}>
-                  <Typography variant="caption" color="success.contrastText">
-                    文字起こし結果プレビュー:
-                  </Typography>
-                  <Typography variant="body2" sx={{ mt: 0.5 }}>
-                    {processingProgress.transcriptionResult.text.slice(0, 100)}
-                    {processingProgress.transcriptionResult.text.length > 100 && '...'}
-                  </Typography>
-                </Box>
-              )}
-            </Box>
-          </Fade>
+            </div>
+            
+            <div className={styles.stepper}>
+              {['アップロード', '文字起こし', '保存', '完了'].map((label, index) => {
+                const currentStep = 
+                  processingProgress.stage === 'uploading' ? 0 :
+                  processingProgress.stage === 'transcribing' ? 1 :
+                  processingProgress.stage === 'saving' ? 2 :
+                  processingProgress.stage === 'complete' ? 3 : 0;
+                
+                return (
+                  <div key={label} className={`${styles.step} ${index <= currentStep ? styles.active : ''}`}>
+                    <div className={`${styles.stepIcon} ${index <= currentStep ? styles.active : ''}`}>
+                      {index + 1}
+                    </div>
+                    <div className={styles.stepLabel}>{label}</div>
+                  </div>
+                );
+              })}
+            </div>
+            
+            {processingProgress.transcriptionResult && (
+              <div className={styles.transcriptionPreview}>
+                <div className={styles.transcriptionCaption}>
+                  文字起こし結果プレビュー:
+                </div>
+                <div className={styles.transcriptionText}>
+                  {processingProgress.transcriptionResult.text.slice(0, 100)}
+                  {processingProgress.transcriptionResult.text.length > 100 && '...'}
+                </div>
+              </div>
+            )}
+          </div>
         )}
 
         {/* テキスト入力 */}
         {(currentMode === 'text' || currentMode === 'mixed') && (
-          <TextField
-            ref={textFieldRef}
-            fullWidth
-            multiline
-            minRows={2}
-            maxRows={4}
-            value={text}
-            onChange={handleTextChange}
-            onKeyPress={handleKeyPress}
-            placeholder={placeholder}
-            disabled={isSubmitting || isRecording}
-            helperText={`${text.length}/${maxLength}文字`}
-            sx={{ mb: 2 }}
-            InputProps={{
-              endAdornment: text && (
-                <IconButton
-                  size="small"
-                  onClick={() => setText('')}
-                  disabled={isSubmitting || isRecording}
-                >
-                  <Clear />
-                </IconButton>
-              )
-            }}
-          />
+          <div className={styles.textInputContainer}>
+            <textarea
+              ref={textFieldRef}
+              className={styles.textArea}
+              value={text}
+              onChange={handleTextChange}
+              onKeyPress={handleKeyPress}
+              placeholder={placeholder}
+              disabled={isSubmitting || isRecording}
+            />
+            {text && (
+              <button
+                className={styles.textAreaClearButton}
+                onClick={() => setText('')}
+                disabled={isSubmitting || isRecording}
+              >
+                <ClearIcon className={styles.iconSmall} />
+              </button>
+            )}
+            <div className={styles.characterCount}>
+              {text.length}/{maxLength}文字
+            </div>
+          </div>
         )}
 
         {/* 音声録音・再生 */}
         {(currentMode === 'audio' || currentMode === 'mixed') && (
-          <Box sx={{ mb: 2 }}>
+          <div className={styles.audioContainer}>
             {/* 録音コントロール */}
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1 }}>
+            <div className={styles.audioControls}>
               {!isRecording ? (
-                <Button
-                  variant="contained"
-                  color="primary"
-                  startIcon={<Mic />}
+                <button
+                  className={`${styles.recordButton} ${styles.recordButtonStart}`}
                   onClick={startRecording}
                   disabled={isSubmitting}
-                  size="large"
                 >
+                  <MicIcon className={styles.icon} />
                   録音開始
-                </Button>
+                </button>
               ) : (
-                <Button
-                  variant="contained"
-                  color="error"
-                  startIcon={<MicOff />}
+                <button
+                  className={`${styles.recordButton} ${styles.recordButtonStop}`}
                   onClick={stopRecording}
-                  size="large"
                 >
+                  <MicOffIcon className={styles.icon} />
                   録音停止 ({formatTime(recordingTime)})
-                </Button>
+                </button>
               )}
 
               {audioUrl && (
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <audio controls src={audioUrl} style={{ height: '40px' }} />
-                  <IconButton
-                    size="small"
+                <div className={styles.audioPlayback}>
+                  <audio controls src={audioUrl} className={styles.audioPlayer} />
+                  <button
+                    className={styles.audioDeleteButton}
                     onClick={clearAudio}
                     disabled={isSubmitting || isRecording}
-                    color="error"
                   >
-                    <Clear />
-                  </IconButton>
-                </Box>
+                    <ClearIcon className={styles.iconSmall} />
+                  </button>
+                </div>
               )}
-            </Box>
+            </div>
 
             {/* 録音中インジケータ */}
             {isRecording && (
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, color: 'error.main' }}>
-                <Box
-                  sx={{
-                    width: 8,
-                    height: 8,
-                    borderRadius: '50%',
-                    bgcolor: 'error.main',
-                    animation: 'pulse 1s infinite'
-                  }}
-                />
-                <Typography variant="caption">
+              <div className={styles.recordingIndicator}>
+                <div className={styles.recordingDot} />
+                <div className={styles.recordingText}>
                   録音中... {formatTime(recordingTime)}
-                </Typography>
-              </Box>
+                </div>
+              </div>
             )}
-          </Box>
+          </div>
         )}
 
         {/* 送信ボタン */}
-        <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-          <Button
-            variant="contained"
-            color="primary"
-            endIcon={isSubmitting ? <CircularProgress size={16} /> : <Send />}
+        <div className={styles.submitContainer}>
+          <button
+            className={styles.submitButton}
             onClick={handleSubmit}
             disabled={!canSubmit}
-            size="large"
           >
-            {isSubmitting ? '送信中...' : '送信'}
-          </Button>
-        </Box>
-      </Box>
-    </Paper>
+            {isSubmitting ? (
+              <>
+                <div className={styles.submitSpinner} />
+                送信中...
+              </>
+            ) : (
+              <>
+                <SendIcon className={styles.icon} />
+                送信
+              </>
+            )}
+          </button>
+        </div>
+      </div>
+    </div>
   );
 };
 

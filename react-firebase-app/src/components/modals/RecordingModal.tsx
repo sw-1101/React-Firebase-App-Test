@@ -7,8 +7,8 @@ import {
   Box,
   LinearProgress,
   Fade
-} from '@mui/material';
-import { Stop, CheckCircle, Close } from '@mui/icons-material';
+} from '@/utils/mui-fallbacks';
+import { Stop, CheckCircle, Close } from '@/utils/mui-fallbacks';
 import { WaveformVisualizer } from '@/components/audio/WaveformVisualizer';
 
 /**

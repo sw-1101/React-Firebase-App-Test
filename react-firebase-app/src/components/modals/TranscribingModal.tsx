@@ -8,8 +8,8 @@ import {
   Fade,
   Grow,
   IconButton
-} from '@mui/material';
-import { Close, CheckCircle, Error as ErrorIcon } from '@mui/icons-material';
+} from '@/utils/mui-fallbacks';
+import { Close, CheckCircle, Error as ErrorIcon } from '@/utils/mui-fallbacks';
 
 /**
  * 文字起こしモーダルコンポーネント

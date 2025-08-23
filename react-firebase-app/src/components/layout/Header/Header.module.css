@@ -2,7 +2,7 @@
 
 .header {
   @apply fixed top-0 left-0 right-0 z-50;
-  @apply bg-base-primary border-b border-base-border;
+  @apply bg-white border-b border-gray-200;
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   background: rgba(255, 255, 255, 0.95);

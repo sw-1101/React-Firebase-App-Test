@@ -1,4 +1,5 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
+// TODO: MUI to CSS Modules conversion needed
 import {
   Box,
   IconButton,
@@ -8,8 +9,6 @@ import {
   Fade,
   Chip,
   Paper,
-} from '@mui/material';
-import {
   Mic,
   Stop,
   Pause,
@@ -17,7 +16,7 @@ import {
   Delete,
   VolumeUp,
   GraphicEq
-} from '@mui/icons-material';
+} from '@/utils/mui-fallbacks';
 import { WaveformVisualizer } from './WaveformVisualizer';
 
 /**

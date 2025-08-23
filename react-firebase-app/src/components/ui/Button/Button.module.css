@@ -3,7 +3,7 @@
 .button {
   @apply inline-flex items-center justify-center font-medium transition-all duration-200 ease-out;
   @apply border-0 cursor-pointer outline-none relative overflow-hidden;
-  @apply focus:ring-2 focus:ring-main-primary focus:ring-offset-2;
+  @apply focus:ring-2 focus:ring-purple-500 focus:ring-offset-2;
   
   /* デフォルトでホバー・フォーカス状態の変化を無効化（Framer Motionで制御） */
   transform: translateZ(0); /* GPU加速 */
@@ -11,18 +11,15 @@
 
 /* バリアント - primary */
 .primary {
-  @apply text-white;
-  background: var(--main-gradient);
-  box-shadow: var(--shadow-card);
+  @apply text-white bg-gradient-to-br from-purple-600 to-purple-700 shadow-lg;
 }
 
 .primary:hover:not(.disabled):not(.loading) {
-  background: linear-gradient(135deg, #6366F1, #5B21B6);
-  box-shadow: var(--shadow-bubble);
+  @apply from-purple-500 to-purple-600 shadow-xl;
 }
 
 .primary:active:not(.disabled):not(.loading) {
-  background: var(--main-dark);
+  @apply from-purple-700 to-purple-800;
 }
 
 /* バリアント - secondary */

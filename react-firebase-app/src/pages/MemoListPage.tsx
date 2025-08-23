@@ -1,29 +1,13 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import {
-  Container,
-  Box,
-  Typography,
-  AppBar,
-  Toolbar,
-  IconButton,
-  Dialog,
-  Slide,
-  useMediaQuery,
-  useTheme,
-  Fab,
-} from '@mui/material';
-import { type TransitionProps } from '@mui/material/transitions';
-import {
-  ArrowBack,
-  Search,
-  Add,
-  Refresh
-} from '@mui/icons-material';
+import classNames from 'classnames';
+import { useNavigate } from 'react-router-dom';
 import { MemoProvider, useMemos } from '@/contexts/MemoContext';
 import { MemoTimeline } from '@/components/memo/MemoTimeline';
 import { MemoInput } from '@/components/memo/MemoInput';
 import SearchBox from '@/components/forms/SearchBox/SearchBox';
 import { useAuth } from '@/contexts/AuthContext';
+import { useAuthActions } from '@/hooks/useAuthActions';
+import styles from './MemoListPage.module.css';
 
 /**
  * メモ一覧ページ
@@ -36,12 +20,18 @@ import { useAuth } from '@/contexts/AuthContext';
  * - オフライン対応
  */
 
-// フルスクリーン遷移コンポーネント
-const Transition = React.forwardRef<unknown, TransitionProps & { children: React.ReactElement }>(
-  function Transition(props, ref) {
-    return <Slide direction="up" ref={ref} {...props} />;
-  }
-);
+// レスポンシブフック
+const useIsMobile = () => {
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+  
+  return isMobile;
+};
 
 // メイン画面コンポーネント
 const MemoListPageContent: React.FC = () => {
@@ -56,12 +46,15 @@ const MemoListPageContent: React.FC = () => {
   } = useMemos();
   
   const { state: { user } } = useAuth();
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const { logout } = useAuthActions();
+  const navigate = useNavigate();
+  const isMobile = useIsMobile();
   
   // UI状態
   const [showInput, setShowInput] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
+  const [showMenu, setShowMenu] = useState(false);
+  const [menuClosing, setMenuClosing] = useState(false);
   const [currentlyPlaying, setCurrentlyPlaying] = useState<string | null>(null);
   const [currentPlayTime, setCurrentPlayTime] = useState(0);
   const [currentAudioDuration, setCurrentAudioDuration] = useState(0); // 実際の音声時間
@@ -186,43 +179,80 @@ const MemoListPageContent: React.FC = () => {
     refreshMemos();
   }, [refreshMemos]);
 
+  // ログアウト処理
+  const handleLogout = useCallback(async () => {
+    try {
+      await logout();
+      navigate('/login');
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
+  }, [logout, navigate]);
+
+  // メニューを閉じる（アニメーション付き）
+  const handleMenuClose = useCallback(() => {
+    setMenuClosing(true);
+    setTimeout(() => {
+      setShowMenu(false);
+      setMenuClosing(false);
+    }, 300); // アニメーション時間と同じ
+  }, []);
+
+  // メニューを開く
+  const handleMenuOpen = useCallback(() => {
+    setShowMenu(true);
+    setMenuClosing(false);
+  }, []);
+
   // 表示するメモ一覧
   const displayMemos = isSearching || searchResults.length > 0 ? searchResults : memos;
 
   return (
-    <Box sx={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
-      {/* アプリバー */}
-      <AppBar position="static" elevation={1}>
-        <Toolbar>
-          <Typography variant="h6" sx={{ flexGrow: 1 }}>
-            📝 音声メモ
-          </Typography>
+    <div className={styles.container}>
+      {/* ヘッダー */}
+      <header className={styles.header}>
+        <div className={styles.headerToolbar}>
+          {/* ハンバーガーメニューボタン */}
+          <button
+            className={styles.hamburgerButton}
+            onClick={() => showMenu ? handleMenuClose() : handleMenuOpen()}
+            aria-label="メニュー"
+            type="button"
+          >
+            ☰
+          </button>
           
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <h1 className={styles.headerTitle}>
+            📝 音声メモ
+          </h1>
+          
+          <div className={styles.headerActions}>
             {/* 検索ボタン */}
-            <IconButton
-              color="inherit"
+            <button
+              className={styles.headerButton}
               onClick={() => setShowSearch(!showSearch)}
               aria-label="検索"
+              type="button"
             >
-              <Search />
-            </IconButton>
+              🔍
+            </button>
             
             {/* リフレッシュボタン */}
-            <IconButton
-              color="inherit"
+            <button
+              className={styles.headerButton}
               onClick={refreshMemos}
               disabled={loading}
               aria-label="更新"
+              type="button"
             >
-              <Refresh />
-            </IconButton>
-          </Box>
-        </Toolbar>
+              🔄
+            </button>
+          </div>
+        </div>
         
         {/* 検索バー */}
         {showSearch && (
-          <Box sx={{ px: 2, pb: 1 }}>
+          <div className={styles.searchContainer}>
             <SearchBox
               value={searchQuery}
               onChange={handleSearch}
@@ -231,24 +261,15 @@ const MemoListPageContent: React.FC = () => {
               loading={isSearching}
               fullWidth
             />
-          </Box>
+          </div>
         )}
-      </AppBar>
+      </header>
 
       {/* メイン内容 */}
-      <Box sx={{ flex: 1, overflow: 'auto', position: 'relative' }}>
-        <Container
-          maxWidth="md"
-          sx={{
-            height: '100%',
-            px: { xs: 1, sm: 2 },
-            py: 1,
-            display: 'flex',
-            flexDirection: 'column'
-          }}
-        >
+      <main className={styles.mainContent}>
+        <div className={styles.contentContainer}>
           {/* メモタイムライン */}
-          <Box sx={{ flex: 1, overflow: 'auto' }}>
+          <div className={styles.timelineContainer}>
             <MemoTimeline
               memos={displayMemos}
               loading={loading}
@@ -265,83 +286,128 @@ const MemoListPageContent: React.FC = () => {
               useVirtualScroll={false} // 仮想スクロールを無効化
               height={window.innerHeight - (showSearch ? 160 : 120)}
             />
-          </Box>
-        </Container>
+          </div>
+        </div>
 
         {/* 新規作成ボタン */}
-        <Fab
-          color="primary"
+        <button
+          className={styles.fab}
           aria-label="新しいメモを作成"
           onClick={() => setShowInput(true)}
-          sx={{
-            position: 'fixed',
-            bottom: 16,
-            right: 16,
-            zIndex: 1000
-          }}
+          type="button"
         >
-          <Add />
-        </Fab>
-      </Box>
+          +
+        </button>
+      </main>
 
-      {/* メモ入力ダイアログ */}
-      <Dialog
-        fullScreen={isMobile}
-        open={showInput}
-        onClose={() => setShowInput(false)}
-        TransitionComponent={Transition}
-        maxWidth="md"
-        fullWidth
-        PaperProps={{
-          sx: {
-            minHeight: isMobile ? '100vh' : '60vh',
-            ...(isMobile && {
-              margin: 0,
-              borderRadius: 0
-            })
-          }
-        }}
-      >
-        {/* ダイアログヘッダー */}
-        {isMobile && (
-          <AppBar position="static" elevation={0}>
-            <Toolbar>
-              <IconButton
-                edge="start"
-                color="inherit"
-                onClick={() => setShowInput(false)}
-                aria-label="閉じる"
-              >
-                <ArrowBack />
-              </IconButton>
-              <Typography variant="h6" sx={{ flexGrow: 1 }}>
+      {/* メモ入力モーダル */}
+      {showInput && (
+        <div className={styles.modalOverlay} onClick={() => setShowInput(false)}>
+          <div 
+            className={classNames(
+              styles.modalContent,
+              { [styles.modalContentMobile]: isMobile }
+            )}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* モーダルヘッダー */}
+            <div className={classNames(
+              styles.modalHeader,
+              { [styles.modalHeaderMobile]: isMobile }
+            )}>
+              {isMobile && (
+                <button
+                  className={styles.modalCloseButton}
+                  onClick={() => setShowInput(false)}
+                  aria-label="閉じる"
+                  type="button"
+                >
+                  ←
+                </button>
+              )}
+              <h2 className={styles.modalTitle}>
                 新しいメモ
-              </Typography>
-            </Toolbar>
-          </AppBar>
-        )}
-        
-        {/* メモ入力フォーム */}
-        <Box
-          sx={{
-            flex: 1,
-            display: 'flex',
-            flexDirection: 'column',
-            p: { xs: 0, sm: 2 }
-          }}
-        >
-          <MemoInput
-            onSubmitSuccess={handleMemoSubmitSuccess}
-            onSubmitError={(error) => {
-              console.error('Memo submission error:', error);
-            }}
+              </h2>
+              {!isMobile && (
+                <button
+                  className={styles.modalCloseButton}
+                  onClick={() => setShowInput(false)}
+                  aria-label="閉じる"
+                  type="button"
+                >
+                  ✕
+                </button>
+              )}
+            </div>
+            
+            {/* メモ入力フォーム */}
+            <div className={styles.modalBody}>
+              <MemoInput
+                onSubmitSuccess={handleMemoSubmitSuccess}
+                onSubmitError={(error) => {
+                  console.error('Memo submission error:', error);
+                }}
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* スライドアウトメニュー */}
+      {showMenu && (
+        <>
+          {/* オーバーレイ */}
+          <div 
+            className={`${styles.menuOverlay} ${menuClosing ? styles.menuOverlayClosing : ''}`}
+            onClick={handleMenuClose}
           />
-        </Box>
-      </Dialog>
+          
+          {/* メニューパネル */}
+          <div className={`${styles.menuPanel} ${menuClosing ? styles.menuPanelClosing : ''}`}>
+            <div className={styles.menuHeader}>
+              <div className={styles.menuUserInfo}>
+                <div className={styles.menuUserIcon}>👤</div>
+                <div className={styles.menuUserDetails}>
+                  <div className={styles.menuUserName}>
+                    {user?.displayName || user?.email || 'ユーザー'}
+                  </div>
+                  <div className={styles.menuUserEmail}>
+                    {user?.email}
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <nav className={styles.menuNav}>
+              <button
+                className={styles.menuItem}
+                onClick={() => {
+                  navigate('/profile');
+                  handleMenuClose();
+                }}
+              >
+                <span className={styles.menuItemIcon}>👤</span>
+                プロフィール
+              </button>
+              
+              <button
+                className={styles.menuItem}
+                onClick={() => {
+                  handleLogout();
+                  handleMenuClose();
+                }}
+              >
+                <span className={styles.menuItemIcon}>🚪</span>
+                ログアウト
+              </button>
+            </nav>
+          </div>
+        </>
+      )}
 
       {/* 隠しオーディオ要素 */}
       <audio ref={audioRef} style={{ display: 'none' }} />
-    </Box>
+    </div>
   );
 };
 

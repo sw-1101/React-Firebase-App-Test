@@ -115,10 +115,10 @@ interface RequirementsProgress {
 ### バックアップファイル管理
 ```markdown
 ## ファイル構成
-.claude/requirements/
-├── {projectName}-backup.md      # 段階的バックアップ
-├── {projectName}-final.md       # 最終要件定義書
-└── {projectName}-history.md     # 変更履歴
+.claude/memo-app-docs/
+├── {projectName}-requirements.md      # 要件定義書
+├── {projectName}-requirements-backup.md  # バックアップ
+└── {projectName}-requirements-history.md # 変更履歴
 ```
 
 ### 継続セッション開始時

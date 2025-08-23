@@ -335,7 +335,7 @@ class TranscriptionService {
    * 音声継続時間を推定
    */
   async getAudioDuration(audioBlob: Blob): Promise<number> {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       const audioUrl = URL.createObjectURL(audioBlob);
       const audio = new Audio(audioUrl);
       

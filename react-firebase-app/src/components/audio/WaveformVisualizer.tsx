@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Box } from '@mui/material';
-import type { SxProps, Theme } from '@mui/material';
+// TODO: MUI to CSS Modules conversion needed
+import { Box, type SxProps } from '@/utils/mui-fallbacks';
 
 /**
  * 波形表示コンポーネント
@@ -36,7 +36,7 @@ interface WaveformVisualizerProps {
   /** アニメーション速度（FPS） */
   animationSpeed?: number;
   /** カスタムスタイル */
-  sx?: SxProps<Theme>;
+  sx?: SxProps;
 }
 
 export const WaveformVisualizer: React.FC<WaveformVisualizerProps> = ({

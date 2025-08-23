@@ -9,7 +9,7 @@ import {
   LinearProgress,
   TextField,
   Alert
-} from '@mui/material';
+} from '@/utils/mui-fallbacks';
 import {
   Mic,
   MicOff,
@@ -23,7 +23,7 @@ import {
   TableChart,
   Description,
   Upload
-} from '@mui/icons-material';
+} from '@/utils/mui-fallbacks';
 
 interface UploadedFile {
   file: File;
@@ -263,7 +263,7 @@ const MultimodalInput: React.FC<MultimodalInputProps> = ({ onSubmit, loading = f
         rows={4}
         placeholder="質問やメッセージを入力してください..."
         value={textInput}
-        onChange={(e) => setTextInput(e.target.value)}
+        onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setTextInput(e.target.value)}
         disabled={loading}
         sx={{ mb: 2 }}
       />

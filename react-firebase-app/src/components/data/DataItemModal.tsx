@@ -15,7 +15,7 @@ import {
   Checkbox,
   Box,
   Alert,
-} from '@mui/material'
+} from '@/utils/mui-fallbacks'
 import type { DataItem, CreateDataItem } from '../../types/data'
 
 // Vue.js経験者向け解説:

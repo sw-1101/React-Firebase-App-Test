@@ -9,8 +9,8 @@ import {
   Typography,
   Box,
   Chip
-} from '@mui/material'
-import { MoreVert, Favorite, Share } from '@mui/icons-material'
+} from '@/utils/mui-fallbacks'
+import { MoreVert, Favorite, Share } from '@/utils/mui-fallbacks'
 
 export interface CardProps {
   /** カードのタイトル */
@@ -85,7 +85,7 @@ const Card: React.FC<CardProps> = ({
         }
         action={
           onMenuClick && (
-            <IconButton aria-label="settings" onClick={(e) => {
+            <IconButton aria-label="settings" onClick={(e: React.MouseEvent) => {
               e.stopPropagation()
               onMenuClick()
             }}>
@@ -134,7 +134,7 @@ const Card: React.FC<CardProps> = ({
           {onLike && (
             <IconButton 
               aria-label="add to favorites"
-              onClick={(e) => {
+              onClick={(e: React.MouseEvent) => {
                 e.stopPropagation()
                 onLike()
               }}
@@ -151,7 +151,7 @@ const Card: React.FC<CardProps> = ({
           {onShare && (
             <IconButton 
               aria-label="share"
-              onClick={(e) => {
+              onClick={(e: React.MouseEvent) => {
                 e.stopPropagation()
                 onShare()
               }}

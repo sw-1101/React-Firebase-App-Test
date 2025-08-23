@@ -15,7 +15,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 // ダミーの音声URLとタイムスタンプ
-const sampleAudioUrl = 'https://www.soundjay.com/misc/sounds/bell-ringing-05.wav';
+const sampleAudioUrl = 'data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvGEcBwOL0fDHdSsE';
 const sampleTimestamp = new Date();
 
 export const Default: Story = {

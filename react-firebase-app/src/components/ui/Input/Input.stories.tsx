@@ -2,29 +2,29 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { useState } from 'react';
 import Input from './Input';
 
+const InteractiveInput = (args: any) => {
+  const [value, setValue] = useState(args.value || '');
+  return <Input {...args} value={value} onChange={setValue} />;
+};
+
 const meta: Meta<typeof Input> = {
   title: 'UI/Input',
   component: Input,
   parameters: {
     layout: 'centered',
   },
-  tags: ['autodocs'],
 };
 
 export default meta;
-type Story = StoryObj<typeof meta>;
-
-// ステートフルなコンポーネント
-const InteractiveInput = (args: any) => {
-  const [value, setValue] = useState('');
-  return <Input {...args} value={value} onChange={setValue} />;
-};
+type Story = StoryObj<typeof Input>;
 
 export const Default: Story = {
   render: InteractiveInput,
   args: {
     placeholder: 'メッセージを入力してください...',
-  },
+    onFocus: () => console.log('input-focused'),
+    onBlur: () => console.log('input-blurred')
+  }
 };
 
 export const WithError: Story = {
@@ -32,7 +32,7 @@ export const WithError: Story = {
   args: {
     placeholder: 'メッセージを入力してください...',
     error: 'このフィールドは必須です',
-  },
+  }
 };
 
 export const Disabled: Story = {
@@ -40,7 +40,7 @@ export const Disabled: Story = {
   args: {
     placeholder: '無効化された入力フィールド',
     disabled: true,
-  },
+  }
 };
 
 export const AutoResize: Story = {
@@ -52,7 +52,7 @@ export const AutoResize: Story = {
   },
   parameters: {
     layout: 'padded',
-  },
+  }
 };
 
 export const AutoResizeWithContent: Story = {
@@ -61,11 +61,11 @@ export const AutoResizeWithContent: Story = {
     return <Input {...args} value={value} onChange={setValue} />;
   },
   args: {
-    placeholder: 'メッセージを入力...',
+    placeholder: '初期値ありの自動拡張テキストエリア',
     autoResize: true,
-    maxRows: 5,
+    maxRows: 8,
   },
   parameters: {
     layout: 'padded',
-  },
+  }
 };

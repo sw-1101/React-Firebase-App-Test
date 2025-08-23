@@ -1,14 +1,6 @@
 import React, { useState, useCallback } from 'react'
-import { 
-  TextField, 
-  InputAdornment, 
-  IconButton, 
-  Box,
-  Autocomplete,
-  Chip,
-  Paper
-} from '@mui/material'
-import { Search, Clear, FilterList } from '@mui/icons-material'
+import classNames from 'classnames'
+import styles from './SearchBox.module.css'
 
 export interface SearchOption {
   label: string
@@ -57,11 +49,11 @@ const SearchBox: React.FC<SearchBoxProps> = ({
   value = '',
   multiple = false,
   multipleValue = [],
-  width = '100%',
-  size = 'medium',
+  // width = '100%', // 一時的に未使用
+  // size = 'medium', // 一時的に未使用
   disabled = false,
   showFilter = false,
-  loading = false,
+  // loading = false, // 一時的に未使用
   fullWidth = false,
   onSearch,
   onChange,
@@ -96,147 +88,176 @@ const SearchBox: React.FC<SearchBoxProps> = ({
   // 単一選択の場合
   if (!multiple) {
     return (
-      <Box sx={{ width: fullWidth ? '100%' : width }}>
-        <TextField
-          fullWidth
-          size={size}
-          placeholder={placeholder}
-          value={inputValue}
-          disabled={disabled}
-          onChange={(e) => handleInputChange(e.target.value)}
-          onKeyPress={handleKeyPress}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <Search color={disabled ? 'disabled' : 'action'} />
-              </InputAdornment>
-            ),
-            endAdornment: (
-              <InputAdornment position="end">
-                <Box sx={{ display: 'flex', gap: 0.5 }}>
-                  {inputValue && (
-                    <IconButton
-                      size="small"
-                      onClick={handleClear}
-                      disabled={disabled}
-                      aria-label="クリア"
-                    >
-                      <Clear />
-                    </IconButton>
-                  )}
-                  {showFilter && (
-                    <IconButton
-                      size="small"
-                      onClick={onFilterClick}
-                      disabled={disabled}
-                      aria-label="フィルター"
-                    >
-                      <FilterList />
-                    </IconButton>
-                  )}
-                </Box>
-              </InputAdornment>
-            ),
-          }}
-        />
-      </Box>
+      <div className={classNames(
+        styles.container,
+        fullWidth ? styles.containerFullWidth : styles.containerFixedWidth
+      )}>
+        <div className={styles.inputContainer}>
+          <div className={styles.iconContainer}>
+            🔍
+          </div>
+          
+          <input
+            type="text"
+            className={classNames(
+              styles.input,
+              styles.inputWithIcon,
+              { 
+                [styles.inputWithAction]: inputValue || showFilter,
+                [styles.error]: false, // エラー状態は未実装
+              }
+            )}
+            placeholder={placeholder}
+            value={inputValue}
+            disabled={disabled}
+            onChange={(e) => handleInputChange(e.target.value)}
+            onKeyPress={handleKeyPress}
+          />
+          
+          <div className={styles.actionContainer}>
+            {inputValue && (
+              <button
+                type="button"
+                className={classNames(styles.iconButton, styles.clearButton)}
+                onClick={handleClear}
+                disabled={disabled}
+                aria-label="クリア"
+              >
+                ✕
+              </button>
+            )}
+            
+            {showFilter && (
+              <button
+                type="button"
+                className={classNames(
+                  styles.iconButton, 
+                  styles.filterButton,
+                  { [styles.filterButtonActive]: false } // アクティブ状態は未実装
+                )}
+                onClick={onFilterClick}
+                disabled={disabled}
+                aria-label="フィルター"
+              >
+                🔽
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
     )
   }
 
-  // 複数選択の場合（Autocomplete使用）
+  // 複数選択の場合（簡略化版）
   const selectedOptions = options.filter(option => 
     multipleValue.includes(option.value)
   )
+  
+  const [showDropdown, setShowDropdown] = useState(false)
 
   return (
-    <Box sx={{ width }}>
-      <Autocomplete
-        multiple
-        size={size}
-        disabled={disabled}
-        loading={loading}
-        options={options}
-        value={selectedOptions}
-        getOptionLabel={(option) => option.label}
-        isOptionEqualToValue={(option, value) => option.value === value.value}
-        onChange={(_, newValue) => {
-          const values = newValue.map(option => option.value)
-          onMultipleChange?.(values)
-        }}
-        renderInput={(params) => (
-          <TextField
-            {...params}
-            placeholder={selectedOptions.length === 0 ? placeholder : ''}
-            InputProps={{
-              ...params.InputProps,
-              startAdornment: (
-                <InputAdornment position="start">
-                  <Search color={disabled ? 'disabled' : 'action'} />
-                </InputAdornment>
-              ),
-              endAdornment: (
-                <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                  {selectedOptions.length > 0 && (
-                    <IconButton
-                      size="small"
-                      onClick={() => {
-                        onMultipleChange?.([])
-                        onClear?.()
-                      }}
-                      disabled={disabled}
-                      aria-label="すべてクリア"
-                    >
-                      <Clear />
-                    </IconButton>
-                  )}
-                  {showFilter && (
-                    <IconButton
-                      size="small"
-                      onClick={onFilterClick}
-                      disabled={disabled}
-                      aria-label="フィルター"
-                    >
-                      <FilterList />
-                    </IconButton>
-                  )}
-                  {params.InputProps.endAdornment}
-                </Box>
-              ),
-            }}
-          />
-        )}
-        renderTags={(value, getTagProps) =>
-          value.map((option, index) => {
-            const { key, ...tagProps } = getTagProps({ index })
-            return (
-              <Chip
-                key={key}
-                label={option.label}
-                size="small"
-                {...tagProps}
-              />
-            )
-          })
-        }
-        renderOption={(props, option) => (
-          <Box component="li" {...props}>
-            <Box>
-              <Box sx={{ fontWeight: 'medium' }}>{option.label}</Box>
-              {option.category && (
-                <Box sx={{ fontSize: '0.75rem', color: 'text.secondary' }}>
-                  {option.category}
-                </Box>
-              )}
-            </Box>
-          </Box>
-        )}
-        PaperComponent={({ children, ...other }) => (
-          <Paper {...other} sx={{ mt: 1 }}>
-            {children}
-          </Paper>
-        )}
-      />
-    </Box>
+    <div className={classNames(
+      styles.container,
+      fullWidth ? styles.containerFullWidth : styles.containerFixedWidth
+    )}>
+      {/* 選択されたアイテムの表示 */}
+      {selectedOptions.length > 0 && (
+        <div className={styles.filtersContainer}>
+          {selectedOptions.map(option => (
+            <div key={option.value} className={styles.filterChip}>
+              {option.label}
+              <span 
+                className={styles.filterChipRemove}
+                onClick={() => {
+                  const newValues = multipleValue.filter(v => v !== option.value)
+                  onMultipleChange?.(newValues)
+                }}
+              >
+                ×
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
+      
+      <div className={styles.inputContainer}>
+        <div className={styles.iconContainer}>
+          🔍
+        </div>
+        
+        <input
+          type="text"
+          className={classNames(
+            styles.input,
+            styles.inputWithIcon,
+            { [styles.inputWithAction]: selectedOptions.length > 0 || showFilter }
+          )}
+          placeholder={selectedOptions.length === 0 ? placeholder : ''}
+          value={inputValue}
+          disabled={disabled}
+          onChange={(e) => handleInputChange(e.target.value)}
+          onFocus={() => setShowDropdown(true)}
+          onBlur={() => setTimeout(() => setShowDropdown(false), 150)}
+        />
+        
+        <div className={styles.actionContainer}>
+          {selectedOptions.length > 0 && (
+            <button
+              type="button"
+              className={classNames(styles.iconButton, styles.clearButton)}
+              onClick={() => {
+                onMultipleChange?.([])
+                onClear?.()
+              }}
+              disabled={disabled}
+              aria-label="すべてクリア"
+            >
+              ✕
+            </button>
+          )}
+          
+          {showFilter && (
+            <button
+              type="button"
+              className={classNames(styles.iconButton, styles.filterButton)}
+              onClick={onFilterClick}
+              disabled={disabled}
+              aria-label="フィルター"
+            >
+              🔽
+            </button>
+          )}
+        </div>
+      </div>
+      
+      {/* ドロップダウン */}
+      {showDropdown && options.length > 0 && (
+        <div className={styles.dropdown}>
+          {options
+            .filter(option => !inputValue || option.label.toLowerCase().includes(inputValue.toLowerCase()))
+            .map(option => (
+              <div
+                key={option.value}
+                className={styles.dropdownItem}
+                onClick={() => {
+                  if (!multipleValue.includes(option.value)) {
+                    onMultipleChange?.([...multipleValue, option.value])
+                  }
+                  setShowDropdown(false)
+                }}
+              >
+                <div style={{ fontWeight: '500' }}>{option.label}</div>
+                {option.category && (
+                  <div className={styles.dropdownItemCategory}>
+                    {option.category}
+                  </div>
+                )}
+              </div>
+            ))
+          }
+        </div>
+      )}
+    </div>
   )
 }
 

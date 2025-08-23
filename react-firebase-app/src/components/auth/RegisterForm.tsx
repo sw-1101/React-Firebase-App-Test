@@ -1,17 +1,9 @@
 // ユーザー登録フォームコンポーネント
 import React, { useState } from 'react'
-import {
-  Box,
-  Card,
-  CardContent,
-  TextField,
-  Button,
-  Typography,
-  Alert,
-} from '@mui/material'
 import { registerUser } from '../../utils/auth'
 import { useAuth } from '../../contexts/AuthContext'
 import type { RegisterCredentials } from '../../types/auth'
+import styles from './RegisterForm.module.css'
 
 // Vue.js経験者向け解説:
 // - バリデーション処理もVueのリアクティブ機能と同様にuseStateで管理
@@ -121,78 +113,96 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
   }
 
   return (
-    <Card sx={{ maxWidth: 400, mx: 'auto', mt: 4 }}>
-      <CardContent>
-        <Typography variant="h4" component="h1" gutterBottom align="center">
+    <div className={styles.card}>
+      <div className={styles.cardContent}>
+        <h1 className={styles.title}>
           新規登録
-        </Typography>
+        </h1>
         
         {error && (
-          <Alert severity="error" sx={{ mb: 2 }}>
+          <div className={styles.errorAlert} role="alert">
             {error}
-          </Alert>
+          </div>
         )}
 
-        <Box component="form" onSubmit={handleSubmit} sx={{ mt: 2 }}>
-          <TextField
-            fullWidth
-            label="表示名"
-            name="displayName"
-            value={formData.displayName}
-            onChange={handleChange}
-            margin="normal"
-            autoComplete="name"
-          />
+        <form className={styles.form} onSubmit={handleSubmit}>
+          <div className={styles.fieldContainer}>
+            <label htmlFor="displayName" className={styles.label}>
+              表示名
+            </label>
+            <input
+              id="displayName"
+              className={styles.input}
+              name="displayName"
+              type="text"
+              value={formData.displayName}
+              onChange={handleChange}
+              autoComplete="name"
+            />
+          </div>
           
-          <TextField
-            fullWidth
-            label="メールアドレス"
-            name="email"
-            type="email"
-            value={formData.email}
-            onChange={handleChange}
-            required
-            margin="normal"
-            autoComplete="email"
-          />
+          <div className={styles.fieldContainer}>
+            <label htmlFor="email" className={styles.label}>
+              メールアドレス *
+            </label>
+            <input
+              id="email"
+              className={styles.input}
+              name="email"
+              type="email"
+              value={formData.email}
+              onChange={handleChange}
+              required
+              autoComplete="email"
+            />
+          </div>
           
-          <TextField
-            fullWidth
-            label="パスワード"
-            name="password"
-            type="password"
-            value={formData.password}
-            onChange={handleChange}
-            required
-            margin="normal"
-            autoComplete="new-password"
-            helperText="8文字以上、3種類以上の文字（大文字・小文字・数字・記号）を含む"
-          />
+          <div className={styles.fieldContainer}>
+            <label htmlFor="password" className={styles.label}>
+              パスワード *
+            </label>
+            <input
+              id="password"
+              className={styles.input}
+              name="password"
+              type="password"
+              value={formData.password}
+              onChange={handleChange}
+              required
+              autoComplete="new-password"
+            />
+            <div className={styles.helperText}>
+              8文字以上、3種類以上の文字（大文字・小文字・数字・記号）を含む
+            </div>
+          </div>
           
-          <TextField
-            fullWidth
-            label="パスワード確認"
-            name="confirmPassword"
-            type="password"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            required
-            margin="normal"
-            autoComplete="new-password"
-          />
+          <div className={styles.fieldContainer}>
+            <label htmlFor="confirmPassword" className={styles.label}>
+              パスワード確認 *
+            </label>
+            <input
+              id="confirmPassword"
+              className={styles.input}
+              name="confirmPassword"
+              type="password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              required
+              autoComplete="new-password"
+            />
+          </div>
           
-          <Button
+          <button
             type="submit"
-            fullWidth
-            variant="contained"
-            sx={{ mt: 3, mb: 2 }}
+            className={styles.submitButton}
             disabled={loading}
           >
+            {loading && <div className={styles.submitSpinner} />}
             {loading ? '登録中...' : '登録'}
-          </Button>
-        </Box>
-      </CardContent>
-    </Card>
+          </button>
+        </form>
+      </div>
+    </div>
   )
 }
 

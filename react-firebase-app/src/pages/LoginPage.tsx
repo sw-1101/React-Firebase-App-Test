@@ -1,15 +1,15 @@
 // ログインページコンポーネント
 import React from 'react'
-import { Container, Box, Typography, Link } from '@mui/material'
 import { Link as RouterLink, useNavigate } from 'react-router-dom'
 import { LoginForm } from '../components/auth'
 import { useAuth } from '../contexts/AuthContext'
 import { useEffect } from 'react'
+import styles from './LoginPage.module.css'
 
-// Vue.js経験者向け解説:
-// - useNavigate: Vue RouterのuseRouter().push()と同様の機能
-// - useEffect: Vue 3のwatchEffect()と同様のライフサイクル管理
-// - 認証済みユーザーのリダイレクト処理
+// カスタムCSS + CSS Modules実装
+// - レスポンシブデザイン対応
+// - アクセシビリティ対応のフォーカス管理
+// - カスタムテーマ変数活用
 
 const LoginPage: React.FC = () => {
   const navigate = useNavigate()
@@ -18,47 +18,39 @@ const LoginPage: React.FC = () => {
   // 認証済みユーザーは自動的にダッシュボードへリダイレクト
   useEffect(() => {
     if (state.user && !state.loading) {
-      navigate('/dashboard')
+      navigate('/menu')
     }
   }, [state.user, state.loading, navigate])
 
   const handleLoginSuccess = () => {
-    navigate('/dashboard')
+    navigate('/menu')
   }
 
   if (state.loading) {
     return (
-      <Container maxWidth="sm">
-        <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh">
-          <Typography>読み込み中...</Typography>
-        </Box>
-      </Container>
+      <div className={styles.container}>
+        <div className={styles.loadingContainer}>
+          <div className={styles.loadingText}>読み込み中...</div>
+        </div>
+      </div>
     )
   }
 
   return (
-    <Container maxWidth="sm">
-      <Box
-        sx={{
-          minHeight: '100vh',
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          py: 4,
-        }}
-      >
+    <div className={styles.container}>
+      <div className={styles.content}>
         <LoginForm onSuccess={handleLoginSuccess} />
         
-        <Box sx={{ mt: 2, textAlign: 'center' }}>
-          <Typography variant="body2">
+        <div className={styles.registerLinkContainer}>
+          <div className={styles.registerText}>
             アカウントをお持ちでない方は{' '}
-            <Link component={RouterLink} to="/register">
+            <RouterLink to="/register" className={styles.registerLink}>
               こちらから登録
-            </Link>
-          </Typography>
-        </Box>
-      </Box>
-    </Container>
+            </RouterLink>
+          </div>
+        </div>
+      </div>
+    </div>
   )
 }
 

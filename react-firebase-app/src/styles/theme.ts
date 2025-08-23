@@ -1,8 +1,8 @@
-import { createTheme, type ThemeOptions } from '@mui/material/styles';
-// import { UI_CONFIG } from '../constants';
+// カスタムテーマ定義（MUI非依存版）
+// CSS Custom Propertiesとして定義し、CSS Modulesで活用
 
-// Color palette based on design specification
-const palette = {
+// カラーパレット定義
+export const palette = {
   primary: {
     main: '#1976D2',
     dark: '#1565C0',
@@ -42,10 +42,10 @@ const palette = {
     default: '#FAFAFA',
     paper: '#FFFFFF',
   },
-};
+} as const;
 
-// Typography settings
-const typography = {
+// タイポグラフィ設定
+export const typography = {
   fontFamily: [
     '-apple-system',
     'BlinkMacSystemFont',
@@ -94,82 +94,14 @@ const typography = {
     fontSize: '0.875rem',
     fontWeight: 500,
     lineHeight: 1.4,
-    textTransform: 'none' as const,
   },
-};
+} as const;
 
-// Component customizations
-const components = {
-  MuiButton: {
-    styleOverrides: {
-      root: {
-        textTransform: 'none' as const,
-        borderRadius: 8,
-        boxShadow: 'none',
-        '&:hover': {
-          boxShadow: 'none',
-        },
-      },
-      contained: {
-        boxShadow: 'none',
-        '&:hover': {
-          boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
-        },
-      },
-    },
-  },
-  MuiCard: {
-    styleOverrides: {
-      root: {
-        borderRadius: 8,
-        boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-        '&:hover': {
-          boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-          transition: 'box-shadow 0.2s ease-in-out',
-        },
-      },
-    },
-  },
-  MuiFab: {
-    styleOverrides: {
-      root: {
-        boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-        '&:hover': {
-          boxShadow: '0 6px 16px rgba(0,0,0,0.2)',
-        },
-      },
-    },
-  },
-  MuiDialog: {
-    styleOverrides: {
-      paper: {
-        borderRadius: 12,
-      },
-    },
-  },
-  MuiChip: {
-    styleOverrides: {
-      root: {
-        borderRadius: 16,
-      },
-    },
-  },
-  MuiIconButton: {
-    styleOverrides: {
-      root: {
-        '&:hover': {
-          backgroundColor: 'rgba(0,0,0,0.04)',
-        },
-      },
-    },
-  },
-};
+// スペーシング (4px ベース単位)
+export const spacing = 4;
 
-// Spacing (4px base unit)
-const spacing = 4;
-
-// Breakpoints
-const breakpoints = {
+// ブレークポイント
+export const breakpoints = {
   values: {
     xs: 0,
     sm: 600,
@@ -177,40 +109,84 @@ const breakpoints = {
     lg: 1200,
     xl: 1536,
   },
-};
+} as const;
 
-// Shape (border radius)
-const shape = {
+// 形状 (ボーダー半径)
+export const shape = {
   borderRadius: 8,
+} as const;
+
+// CSS Custom Properties生成ヘルパー
+export const generateCSSVariables = () => {
+  const cssVariables: Record<string, string> = {
+    // カラー
+    '--primary-main': palette.primary.main,
+    '--primary-dark': palette.primary.dark,
+    '--primary-light': palette.primary.light,
+    '--secondary-main': palette.secondary.main,
+    '--secondary-dark': palette.secondary.dark,
+    '--secondary-light': palette.secondary.light,
+    '--success-main': palette.success.main,
+    '--warning-main': palette.warning.main,
+    '--error-main': palette.error.main,
+    '--info-main': palette.info.main,
+    
+    // グレイスケール
+    '--grey-50': palette.grey[50],
+    '--grey-100': palette.grey[100],
+    '--grey-200': palette.grey[200],
+    '--grey-500': palette.grey[500],
+    '--grey-700': palette.grey[700],
+    '--grey-900': palette.grey[900],
+    
+    // テキスト
+    '--text-primary': palette.text.primary,
+    '--text-secondary': palette.text.secondary,
+    '--text-disabled': palette.text.disabled,
+    
+    // 背景
+    '--background-default': palette.background.default,
+    '--background-paper': palette.background.paper,
+    
+    // タイポグラフィ
+    '--font-family': typography.fontFamily,
+    
+    // スペーシング
+    '--spacing-unit': `${spacing}px`,
+    
+    // 形状
+    '--border-radius': `${shape.borderRadius}px`,
+  };
+
+  return cssVariables;
 };
 
-const themeOptions: ThemeOptions = {
+// デフォルトテーマエクスポート（後方互換性のため）
+export const theme = {
   palette,
   typography,
-  components,
   spacing,
   breakpoints,
   shape,
 };
 
-export const theme = createTheme(themeOptions);
-
-// Dark theme (for future use)
-export const darkTheme = createTheme({
-  ...themeOptions,
-  palette: {
-    ...palette,
-    mode: 'dark',
-    background: {
-      default: '#121212',
-      paper: '#1E1E1E',
-    },
-    text: {
-      primary: '#FFFFFF',
-      secondary: '#AAAAAA',
-      disabled: '#666666',
-    },
+// ダークテーマ設定（将来使用）
+export const darkPalette = {
+  ...palette,
+  background: {
+    default: '#121212',
+    paper: '#1E1E1E',
   },
-});
+  text: {
+    primary: '#FFFFFF',
+    secondary: '#AAAAAA',
+    disabled: '#666666',
+  },
+} as const;
+
+export const darkTheme = {
+  ...theme,
+  palette: darkPalette,
+};
 
 export default theme;

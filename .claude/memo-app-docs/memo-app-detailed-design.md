@@ -1,15 +1,17 @@
-# メモアプリ詳細設計書
+# メモアプリ詳細設計書 v2.0 - LINE風紫系UI対応
 
 ## 1. 設計概要
 
 ### 1.1 要件定義書参照
 - 音声・テキストメモの保存・検索アプリ
 - コンセプト: 「ひらめきをパッと保存、パッと検索」
-- 基本仕様: 音声録音（30秒〜1分）、自動文字起こし、タイムライン表示
+- 基本仕様: 音声録音（任意時間・手動停止）、自動文字起こし、LINE風タイムライン表示
+- 新デザイン: 自分との対話を表現するLINE風チャット形式
 
 ### 1.2 技術スタック確認
 - **Frontend**: React 19 + TypeScript + Vite
-- **UI Framework**: Material-UI + Tailwind CSS
+- **UI Framework**: カスタムコンポーネント + Tailwind CSS + CSS Modules
+- **Animation**: Framer Motion
 - **State Management**: Context API
 - **Backend**: Firebase (Authentication, Firestore, Storage)
 - **Audio Processing**: Web Audio API
@@ -21,24 +23,28 @@
 - リアルタイム同期（Firestore）
 - PWA対応（オフライン機能）
 - レスポンシブデザイン（モバイルファースト）
+- Material-UI完全削除による軽量化
 
 ### 1.4 設計方針・原則
-- 共通規約準拠（責任分離、型安全性、エラーハンドリング）
-- Atomic Design適用
-- アクセシビリティ対応
-- パフォーマンス最適化
+- **LINE風UI体験**: 親しみやすいメッセージング形式
+- **紫系モダンデザイン**: 青紫〜純パープルのグラデーション
+- **3色ルール遵守**: ベース（70%）・メイン（25%）・アクセント（5%）
+- **共通規約準拠**: 責任分離、型安全性、エラーハンドリング
+- **カスタムコンポーネント**: Atomic Design + 完全自作UI
 
-## 2. システム構成
+## 2. システム構成・カラーパレット
 
 ### 2.1 全体アーキテクチャ
 ```
+[LINE風UI Layer] ←→ [Custom Components] ←→ [Framer Motion]
+        ↓
 [React App] ←→ [Firebase Auth] ←→ [User Management]
      ↓
 [Audio Recording] → [OpenAI Whisper] → [Text Processing]
      ↓                    ↓
 [Firebase Storage] ← [Firestore] → [Real-time Sync]
      ↓                    ↓
-[Timeline View] ← [Search & Filter] ← [User Interface]
+[Message Timeline] ← [Search & Filter] ← [Chat Interface]
 ```
 
 ### 2.2 フロントエンド構成
@@ -46,70 +52,163 @@
 - **Client-side Routing**: React Router
 - **State Management**: Context API + useReducer
 - **Component Architecture**: Atomic Design
-- **Styling**: Material-UI + Tailwind CSS
+- **Styling**: Tailwind CSS + CSS Modules（Material-UI完全削除）
+- **Animation**: Framer Motion（マイクロインタラクション）
 
-### 2.3 バックエンド構成
-- **Authentication**: Firebase Auth
+### 2.3 カラーパレット設計（3色ルール）
+
+#### ベースカラー（70%使用）
+```css
+/* プライマリ背景色 */
+--base-primary: #FFFFFF;        /* メイン背景 */
+--base-secondary: #F9FAFB;      /* セカンダリ背景・タイムライン */
+--base-tertiary: #F3F4F6;       /* カード・入力エリア背景 */
+--base-border: #E5E7EB;         /* ボーダー・区切り線 */
+--base-text-primary: #111827;   /* メインテキスト */
+--base-text-secondary: #6B7280; /* セカンダリテキスト */
+```
+
+#### メインカラー（25%使用）- 紫系グラデーション
+```css
+/* 紫系統のブランドカラー */
+--main-primary: #7C3AED;        /* メインパープル - プライマリボタン */
+--main-secondary: #6366F1;      /* 青紫 - グラデーション用 */
+--main-light: #C4B5FD;          /* 薄紫 - 自分のメッセージバブル */
+--main-dark: #5B21B6;           /* 濃紫 - アクティブ・ホバー状態 */
+--main-gradient: linear-gradient(135deg, #7C3AED, #6366F1);
+```
+
+#### アクセントカラー（5%使用）
+```css
+/* 機能別アクセントカラー */
+--accent-primary: #EC4899;      /* ピンク紫 - 録音・重要なアクション */
+--accent-warning: #F59E0B;      /* アンバー - 警告・注意 */
+--accent-success: #10B981;      /* エメラルド - 成功・完了 */
+--accent-error: #EF4444;        /* レッド - エラー・削除 */
+```
+
+#### ダークモード対応
+```css
+/* ダークモードカラーセット */
+--dark-base-primary: #1F2937;
+--dark-base-secondary: #111827;
+--dark-base-tertiary: #374151;
+--dark-base-border: #4B5563;
+--dark-text-primary: #F9FAFB;
+--dark-text-secondary: #D1D5DB;
+```
+
+### 2.4 バックエンド構成
+- **Authentication**: Firebase Auth（メール/Google）
 - **Database**: Firebase Firestore
 - **File Storage**: Firebase Storage
 - **External API**: OpenAI Whisper API
 - **Real-time**: Firestore Real-time Listeners
 
-### 2.4 外部サービス連携
+### 2.5 外部サービス連携
 - **OpenAI Whisper API**: 音声文字起こし
 - **Firebase Services**: 認証・DB・ストレージ
 - **Vercel**: ホスティング・デプロイ
 
-## 3. ファイル構成設計
+## 3. ファイル構成設計（LINE風UI対応）
 
-### 3.1 ディレクトリ構造
+### 3.1 新ディレクトリ構造（カスタムコンポーネント）
 ```
 src/
 ├── views/                          # 画面コンポーネント（APIアクセス可）
-│   ├── MemoListPage.tsx           # メインタイムライン画面
+│   ├── MemoTimelinePage.tsx       # メインタイムライン画面（LINE風）
 │   ├── LoginPage.tsx              # ログイン画面
 │   └── SettingsPage.tsx           # 設定画面
-├── components/                     # UIコンポーネント
-│   ├── common/                    # 汎用コンポーネント
-│   │   ├── buttons/
-│   │   │   ├── FloatingActionButton.tsx  # 🎤 録音ボタン
-│   │   │   ├── IconButton.tsx
+├── components/                     # UIコンポーネント（Material-UI非依存）
+│   ├── ui/                        # 基本UIコンポーネント
+│   │   ├── Button/                # カスタムボタン
+│   │   │   ├── Button.tsx
+│   │   │   ├── Button.module.css
+│   │   │   ├── Button.stories.tsx
 │   │   │   └── index.ts
-│   │   ├── forms/
-│   │   │   ├── TextInput.tsx
-│   │   │   ├── SearchBox.tsx
+│   │   ├── Card/                  # カードコンポーネント
+│   │   │   ├── Card.tsx
+│   │   │   ├── Card.module.css
 │   │   │   └── index.ts
-│   │   ├── layout/
-│   │   │   ├── AppHeader.tsx
-│   │   │   ├── AppLayout.tsx
+│   │   ├── Input/                 # 入力フィールド
+│   │   │   ├── Input.tsx
+│   │   │   ├── Input.module.css
 │   │   │   └── index.ts
-│   │   ├── modals/
-│   │   │   ├── RecordingModal.tsx     # 録音中モーダル
-│   │   │   ├── TranscribingModal.tsx  # 文字起こし中モーダル
-│   │   │   ├── ConfirmModal.tsx
+│   │   ├── Modal/                 # モーダルベース
+│   │   │   ├── Modal.tsx
+│   │   │   ├── Modal.module.css
 │   │   │   └── index.ts
-│   │   ├── feedback/
-│   │   │   ├── LoadingSpinner.tsx
-│   │   │   ├── ErrorMessage.tsx
-│   │   │   ├── SuccessToast.tsx       # PSトロフィー風通知
+│   │   └── index.ts
+│   ├── memo/                      # メモ機能コンポーネント
+│   │   ├── MessageBubble/         # LINE風メッセージバブル
+│   │   │   ├── MessageBubble.tsx
+│   │   │   ├── MessageBubble.module.css
 │   │   │   └── index.ts
-│   │   └── audio/
-│   │       ├── WaveformVisualizer.tsx  # 波形アニメーション
-│   │       ├── AudioPlayer.tsx         # 音声再生
+│   │   ├── Timeline/              # タイムライン
+│   │   │   ├── Timeline.tsx
+│   │   │   ├── Timeline.module.css
+│   │   │   └── index.ts
+│   │   ├── AudioMessage/          # 音声メッセージ
+│   │   │   ├── AudioMessage.tsx
+│   │   │   ├── AudioMessage.module.css
+│   │   │   └── index.ts
+│   │   ├── TextMessage/           # テキストメッセージ
+│   │   │   ├── TextMessage.tsx
+│   │   │   ├── TextMessage.module.css
+│   │   │   └── index.ts
+│   │   ├── InputArea/             # 入力エリア
+│   │   │   ├── InputArea.tsx
+│   │   │   ├── InputArea.module.css
+│   │   │   └── index.ts
+│   │   └── index.ts
+│   ├── layout/                    # レイアウトコンポーネント
+│   │   ├── Header/                # ヘッダーバー
+│   │   │   ├── Header.tsx
+│   │   │   ├── Header.module.css
+│   │   │   └── index.ts
+│   │   ├── ChatLayout/            # チャットレイアウト
+│   │   │   ├── ChatLayout.tsx
+│   │   │   ├── ChatLayout.module.css
+│   │   │   └── index.ts
+│   │   └── FloatingButton/        # フローティングアクションボタン
+│   │       ├── FloatingButton.tsx
+│   │       ├── FloatingButton.module.css
 │   │       └── index.ts
-│   └── pages/                     # 画面専用コンポーネント
-│       ├── memo/
-│       │   ├── MemoTimeline.tsx       # タイムライン表示
-│       │   ├── MemoCard.tsx           # 個別メモカード
-│       │   ├── MemoInput.tsx          # テキスト入力エリア
-│       │   └── index.ts
-│       └── auth/
-│           ├── LoginForm.tsx
-│           └── index.ts
+│   ├── modals/                    # モーダル系コンポーネント
+│   │   ├── RecordingModal/        # 録音中モーダル（フルスクリーン）
+│   │   │   ├── RecordingModal.tsx
+│   │   │   ├── RecordingModal.module.css
+│   │   │   └── index.ts
+│   │   ├── TranscribingModal/     # 文字起こし中モーダル
+│   │   │   ├── TranscribingModal.tsx
+│   │   │   ├── TranscribingModal.module.css
+│   │   │   └── index.ts
+│   │   └── index.ts
+│   ├── feedback/                  # フィードバック系
+│   │   ├── TrophyNotification/    # トロフィー風通知
+│   │   │   ├── TrophyNotification.tsx
+│   │   │   ├── TrophyNotification.module.css
+│   │   │   └── index.ts
+│   │   ├── LoadingSpinner/
+│   │   │   ├── LoadingSpinner.tsx
+│   │   │   ├── LoadingSpinner.module.css
+│   │   │   └── index.ts
+│   │   └── index.ts
+│   ├── audio/                     # 音声関連コンポーネント
+│   │   ├── WaveformVisualizer/    # 波形アニメーション
+│   │   │   ├── WaveformVisualizer.tsx
+│   │   │   ├── WaveformVisualizer.module.css
+│   │   │   └── index.ts
+│   │   ├── AudioPlayer/           # 音声再生
+│   │   │   ├── AudioPlayer.tsx
+│   │   │   ├── AudioPlayer.module.css
+│   │   │   └── index.ts
+│   │   └── index.ts
+│   └── index.ts
 ├── stores/                        # 状態管理
 │   ├── AuthContext.tsx           # 認証状態
 │   ├── MemoContext.tsx           # メモデータ状態
-│   ├── UIContext.tsx             # UI状態（モーダル等）
+│   ├── UIContext.tsx             # UI状態（モーダル、テーマ等）
 │   └── index.ts
 ├── services/                      # API・サービス層
 │   ├── firebase/
@@ -129,217 +228,351 @@ src/
 │   ├── Memo.ts
 │   ├── User.ts
 │   ├── Audio.ts
+│   ├── Message.ts                # メッセージ型（LINE風）
 │   └── index.ts
 ├── hooks/                         # カスタムフック
 │   ├── useAudioRecording.ts      # 音声録音フック
 │   ├── useFirestore.ts           # Firestoreフック
 │   ├── useAuth.ts                # 認証フック
+│   ├── useTheme.ts               # テーマ切り替えフック
 │   └── index.ts
 ├── constants/
 │   ├── audioConfig.ts            # 音声設定
-│   ├── uiConfig.ts              # UI設定
+│   ├── uiConfig.ts              # UI設定（カラー・サイズ）
+│   ├── colors.ts                 # カラーパレット定数
 │   └── index.ts
 ├── styles/
-│   ├── globals.css
-│   ├── theme.ts                  # Material-UIテーマ
-│   └── tailwind.config.js
+│   ├── globals.css               # グローバルスタイル
+│   ├── variables.css             # CSS変数（カラーパレット）
+│   ├── animations.css            # アニメーション定義
+│   └── tailwind.config.js        # Tailwind設定
+├── utils/                         # ユーティリティ関数
+│   ├── classNames.ts             # CSS Modules用クラス結合
+│   ├── animations.ts             # Framer Motion設定
+│   └── index.ts
 ├── App.tsx
 └── main.tsx
 ```
 
-### 3.2 主要ファイル一覧
+### 3.2 CSS Modules + Tailwind構成
+```
+src/styles/
+├── globals.css                    # Tailwind基本設定・グローバルスタイル
+├── variables.css                  # カラーパレット・サイズ変数
+├── animations.css                 # キーフレーム・アニメーション
+└── components/                    # コンポーネント別スタイル
+    ├── MessageBubble.module.css   # メッセージバブルスタイル
+    ├── Timeline.module.css        # タイムラインスタイル
+    ├── RecordingModal.module.css  # 録音モーダルスタイル
+    └── ...
+```
+
+### 3.3 主要ファイル一覧（新UI対応）
 | ファイル | 責務 | 技術要素 |
 |---------|------|----------|
-| MemoListPage.tsx | メイン画面、データ取得 | Firestore Listener |
-| RecordingModal.tsx | 録音UI、波形表示 | Web Audio API |
-| TranscribingModal.tsx | 文字起こし進行表示 | OpenAI API |
-| MemoTimeline.tsx | タイムライン表示 | 仮想スクロール |
-| AudioPlayer.tsx | 音声再生 | HTML5 Audio |
+| MemoTimelinePage.tsx | メイン画面、LINE風レイアウト | Firestore Listener |
+| MessageBubble.tsx | メッセージバブル（自分・システム） | CSS Modules + Tailwind |
+| RecordingModal.tsx | 録音UI、波形表示 | Framer Motion + Web Audio |
+| TranscribingModal.tsx | 文字起こし進行表示 | グラデーションアニメーション |
+| Timeline.tsx | 無限スクロールタイムライン | 仮想スクロール + 日付グループ化 |
+| AudioMessage.tsx | 音声メッセージバブル | HTML5 Audio + 波形可視化 |
+| InputArea.tsx | LINE風入力エリア | 自動拡張テキストエリア |
 | useAudioRecording.ts | 録音ロジック | MediaRecorder API |
 
-### 3.3 命名規則適用
-- **コンポーネント**: PascalCase (`MemoCard.tsx`)
+### 3.4 命名規則適用
+- **コンポーネント**: PascalCase (`MessageBubble.tsx`)
+- **CSS Modules**: PascalCase + `.module.css` (`MessageBubble.module.css`)
 - **フック**: camelCase with "use" prefix (`useAudioRecording.ts`)
-- **型定義**: PascalCase (`Memo.ts`, `AudioRecording.ts`)
+- **型定義**: PascalCase (`Message.ts`, `AudioRecording.ts`)
 - **サービス**: camelCase (`audioRecorder.ts`)
 
-### 3.4 依存関係
+### 3.5 依存関係・Material-UI移行
 ```typescript
-// views層 → components/pages → components/common
-// services層 → 外部API・Firebase
-// hooks層 → services層
-// stores層 → services層・hooks層
+// 新しい依存関係
+// views層 → components/memo → components/ui → components/layout
+// CSS Modules層 → Tailwind Utility Classes
+// Framer Motion → マイクロインタラクション
+// services層 → 外部API・Firebase（変更なし）
+// hooks層 → services層 + UI制御
+// stores層 → services層・hooks層（変更なし）
+
+// Material-UI削除による変更
+// 削除: @mui/material, @mui/icons-material, @emotion/*
+// 追加: framer-motion, classnames (CSS Modules用)
 ```
 
-## 4. コンポーネント設計
+## 4. コンポーネント設計（LINE風UI）
 
-### 4.1 コンポーネント階層（Atomic Design）
+### 4.1 コンポーネント階層（Atomic Design + LINE風）
 
-#### Atoms（原子）
+#### Atoms（原子）- 基本UIコンポーネント
 ```typescript
-// FloatingActionButton.tsx - 録音開始ボタン
-interface FloatingActionButtonProps {
-  onClick: () => void;
-  recording: boolean;
+// Button.tsx - カスタムボタン（Material-UI代替）
+interface ButtonProps {
+  children: React.ReactNode;
+  variant?: 'primary' | 'secondary' | 'ghost';
+  size?: 'sm' | 'md' | 'lg';
   disabled?: boolean;
+  loading?: boolean;
+  className?: string;
+  onClick?: () => void;
 }
 
-// IconButton.tsx - 汎用アイコンボタン
-interface IconButtonProps {
-  icon: React.ReactNode;
-  onClick: () => void;
-  variant?: 'primary' | 'secondary';
-  size?: 'small' | 'medium' | 'large';
-}
-
-// WaveformVisualizer.tsx - 波形表示
-interface WaveformVisualizerProps {
-  audioData: Float32Array;
-  isRecording: boolean;
-  duration: number;
-}
-
-// AudioPlayer.tsx - 音声再生
-interface AudioPlayerProps {
-  audioUrl: string;
-  duration: number;
-  onPlay?: () => void;
-  onPause?: () => void;
-}
-```
-
-#### Molecules（分子）
-```typescript
-// MemoCard.tsx - 個別メモ表示
-interface MemoCardProps {
-  memo: Memo;
-  onPlay: (audioUrl: string) => void;
-  onDelete: (memoId: string) => void;
-}
-
-// MemoInput.tsx - テキスト入力
-interface MemoInputProps {
-  onSubmit: (text: string) => void;
-  onStartRecording: () => void;
-  disabled?: boolean;
-}
-
-// SearchBox.tsx - 検索入力
-interface SearchBoxProps {
+// Input.tsx - カスタム入力フィールド
+interface InputProps {
   value: string;
   onChange: (value: string) => void;
-  placeholder: string;
+  placeholder?: string;
+  disabled?: boolean;
+  autoResize?: boolean; // LINE風自動拡張
+  maxRows?: number;
+  className?: string;
+}
+
+// Card.tsx - カードベース
+interface CardProps {
+  children: React.ReactNode;
+  variant?: 'default' | 'elevated' | 'outlined';
+  className?: string;
+}
+
+// Modal.tsx - モーダルベース
+interface ModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  children: React.ReactNode;
+  fullScreen?: boolean; // 録音モーダル用
+  backdrop?: 'blur' | 'dark' | 'transparent';
 }
 ```
 
-#### Organisms（組織）
+#### Molecules（分子）- LINE風メッセージング
 ```typescript
-// MemoTimeline.tsx - タイムライン全体
-interface MemoTimelineProps {
-  memos: Memo[];
-  loading: boolean;
-  onLoadMore: () => void;
-  onPlayAudio: (audioUrl: string) => void;
+// MessageBubble.tsx - LINE風メッセージバブル
+interface MessageBubbleProps {
+  type: 'own' | 'system';
+  children: React.ReactNode;
+  timestamp: Date;
+  showTime?: boolean;
+  className?: string;
 }
 
-// RecordingModal.tsx - 録音モーダル
+// AudioMessage.tsx - 音声メッセージ
+interface AudioMessageProps {
+  audioUrl: string;
+  duration: number;
+  transcription?: string;
+  timestamp: Date;
+  isPlaying?: boolean;
+  onPlay: () => void;
+  onPause: () => void;
+}
+
+// TextMessage.tsx - テキストメッセージ
+interface TextMessageProps {
+  content: string;
+  timestamp: Date;
+  type: 'own' | 'system';
+  showTime?: boolean;
+}
+
+// InputArea.tsx - LINE風入力エリア
+interface InputAreaProps {
+  value: string;
+  onChange: (value: string) => void;
+  onSend: () => void;
+  onStartRecording: () => void;
+  disabled?: boolean;
+  placeholder?: string;
+}
+```
+
+#### Organisms（組織）- 複合コンポーネント
+```typescript
+// Timeline.tsx - LINE風タイムライン
+interface TimelineProps {
+  messages: Message[];
+  loading: boolean;
+  hasMore: boolean;
+  currentPlayingId?: string;
+  onLoadMore: () => void;
+  onPlayAudio: (messageId: string) => void;
+  onDeleteMessage: (messageId: string) => void;
+}
+
+// RecordingModal.tsx - 録音フルスクリーンモーダル
 interface RecordingModalProps {
   isOpen: boolean;
   onClose: () => void;
   onComplete: (audioBlob: Blob) => void;
-  maxDuration: number;
+  maxDuration?: number;
+  showWaveform?: boolean;
 }
 
-// TranscribingModal.tsx - 文字起こしモーダル
+// TranscribingModal.tsx - 文字起こし処理モーダル
 interface TranscribingModalProps {
   isOpen: boolean;
   progress: number;
-  message: string;
+  stage: 'uploading' | 'transcribing' | 'saving';
+  message?: string;
+}
+
+// Header.tsx - アプリヘッダー
+interface HeaderProps {
+  title: string;
+  onSearchToggle?: () => void;
+  onThemeToggle?: () => void;
+  onSettingsClick?: () => void;
+  searchVisible?: boolean;
 }
 ```
 
-#### Templates（テンプレート）
+#### Templates（テンプレート）- レイアウト
 ```typescript
-// AppLayout.tsx - アプリ全体レイアウト
-interface AppLayoutProps {
+// ChatLayout.tsx - チャットアプリレイアウト
+interface ChatLayoutProps {
   children: React.ReactNode;
-  showHeader?: boolean;
-  showFloatingButton?: boolean;
+  header?: React.ReactNode;
+  inputArea?: React.ReactNode;
+  floatingButton?: React.ReactNode;
+  className?: string;
+}
+
+// AuthLayout.tsx - 認証画面レイアウト
+interface AuthLayoutProps {
+  children: React.ReactNode;
+  title: string;
+  description?: string;
 }
 ```
 
-### 4.2 共通コンポーネント
+### 4.2 重要コンポーネント実装例
 
-#### FloatingActionButton（録音ボタン）
+#### MessageBubble（LINE風メッセージバブル）
 ```typescript
-// components/common/buttons/FloatingActionButton.tsx
+// components/memo/MessageBubble/MessageBubble.tsx
 import React from 'react';
-import { Fab } from '@mui/material';
-import { Mic, Stop } from '@mui/icons-material';
+import { motion } from 'framer-motion';
+import classNames from 'classnames';
+import styles from './MessageBubble.module.css';
 
-interface FloatingActionButtonProps {
-  recording: boolean;
-  onClick: () => void;
-  disabled?: boolean;
+interface MessageBubbleProps {
+  type: 'own' | 'system';
+  children: React.ReactNode;
+  timestamp: Date;
+  showTime?: boolean;
+  className?: string;
 }
 
-const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({
-  recording,
-  onClick,
-  disabled = false
+const MessageBubble: React.FC<MessageBubbleProps> = ({
+  type,
+  children,
+  timestamp,
+  showTime = true,
+  className
 }) => {
+  const formatTime = (date: Date) => {
+    return date.toLocaleTimeString('ja-JP', {
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
+
   return (
-    <Fab
-      color={recording ? "secondary" : "primary"}
-      onClick={onClick}
-      disabled={disabled}
-      sx={{
-        position: 'fixed',
-        bottom: 80,
-        right: 16,
-        animation: recording ? 'pulse 1s infinite' : 'none',
-        '@keyframes pulse': {
-          '0%': { transform: 'scale(1)' },
-          '50%': { transform: 'scale(1.1)' },
-          '100%': { transform: 'scale(1)' }
-        }
-      }}
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3, ease: 'easeOut' }}
+      className={classNames(
+        styles.container,
+        styles[type],
+        className
+      )}
     >
-      {recording ? <Stop /> : <Mic />}
-    </Fab>
+      <div className={classNames(styles.bubble, styles[type])}>
+        {children}
+      </div>
+      {showTime && (
+        <span className={styles.timestamp}>
+          {formatTime(timestamp)}
+        </span>
+      )}
+    </motion.div>
   );
 };
 
-export default FloatingActionButton;
+export default MessageBubble;
 ```
 
-#### RecordingModal（録音モーダル）
+```css
+/* components/memo/MessageBubble/MessageBubble.module.css */
+.container {
+  @apply flex flex-col mb-2;
+}
+
+.container.own {
+  @apply items-end;
+}
+
+.container.system {
+  @apply items-start;
+}
+
+.bubble {
+  @apply max-w-[70%] px-4 py-3 rounded-[18px] break-words;
+  word-wrap: break-word;
+}
+
+.bubble.own {
+  @apply text-white;
+  background: var(--main-gradient);
+  border-radius: 18px 18px 4px 18px;
+  box-shadow: 0 2px 8px rgba(124, 58, 237, 0.25);
+}
+
+.bubble.system {
+  @apply bg-base-tertiary text-base-text-primary;
+  border-radius: 18px 18px 18px 4px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.timestamp {
+  @apply text-xs text-base-text-secondary mt-1 px-2;
+}
+
+.container.own .timestamp {
+  @apply text-right;
+}
+
+.container.system .timestamp {
+  @apply text-left;
+}
+```
+
+#### RecordingModal（録音フルスクリーンモーダル）
 ```typescript
-// components/common/modals/RecordingModal.tsx
+// components/modals/RecordingModal/RecordingModal.tsx
 import React, { useState, useEffect } from 'react';
-import {
-  Dialog,
-  DialogContent,
-  Typography,
-  IconButton,
-  Box,
-  LinearProgress
-} from '@mui/material';
-import { Stop, CheckCircle } from '@mui/icons-material';
-import { WaveformVisualizer } from '@/components/common/audio';
+import { motion, AnimatePresence } from 'framer-motion';
+import classNames from 'classnames';
+import { Modal } from '@/components/ui';
+import { WaveformVisualizer } from '@/components/audio';
+import styles from './RecordingModal.module.css';
 
 interface RecordingModalProps {
   isOpen: boolean;
   onClose: () => void;
   onComplete: (audioBlob: Blob) => void;
   maxDuration?: number;
+  showWaveform?: boolean;
 }
 
 const RecordingModal: React.FC<RecordingModalProps> = ({
   isOpen,
   onClose,
   onComplete,
-  maxDuration = 60
+  maxDuration = 60,
+  showWaveform = true
 }) => {
   const [duration, setDuration] = useState(0);
   const [audioData, setAudioData] = useState<Float32Array>(new Float32Array());
@@ -364,7 +597,7 @@ const RecordingModal: React.FC<RecordingModalProps> = ({
   }, [isOpen, maxDuration]);
 
   const handleStop = () => {
-    // 録音停止ロジック
+    // 実際の録音停止ロジックはuseAudioRecordingフックで処理
     onComplete(new Blob()); // 実際のaudioBlobを渡す
     onClose();
   };
@@ -378,803 +611,485 @@ const RecordingModal: React.FC<RecordingModalProps> = ({
   const progress = (duration / maxDuration) * 100;
 
   return (
-    <Dialog
-      open={isOpen}
+    <Modal
+      isOpen={isOpen}
       onClose={onClose}
       fullScreen
-      sx={{ '& .MuiDialog-paper': { bgcolor: 'black', color: 'white' } }}
+      backdrop="dark"
     >
-      <DialogContent sx={{ 
-        display: 'flex', 
-        flexDirection: 'column', 
-        alignItems: 'center',
-        justifyContent: 'center',
-        height: '100vh'
-      }}>
-        <Typography variant="h4" sx={{ mb: 4, color: 'white' }}>
-          録音中
-        </Typography>
+      <div className={styles.container}>
+        <motion.h1
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className={styles.title}
+        >
+          音声録音中
+        </motion.h1>
         
-        <WaveformVisualizer
-          audioData={audioData}
-          isRecording={true}
-          duration={duration}
-        />
-        
-        <Typography variant="h2" sx={{ my: 4, color: 'white' }}>
-          {formatTime(duration)}
-        </Typography>
-        
-        <LinearProgress
-          variant="determinate"
-          value={progress}
-          sx={{ width: '80%', mb: 4 }}
-        />
-        
-        <Box sx={{ display: 'flex', gap: 2 }}>
-          <IconButton
-            onClick={handleStop}
-            sx={{ 
-              bgcolor: 'red', 
-              color: 'white',
-              width: 80,
-              height: 80,
-              '&:hover': { bgcolor: 'darkred' }
-            }}
+        {showWaveform && (
+          <motion.div
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ delay: 0.2 }}
+            className={styles.waveformContainer}
           >
-            <Stop fontSize="large" />
-          </IconButton>
+            <WaveformVisualizer
+              audioData={audioData}
+              isRecording={true}
+              duration={duration}
+            />
+          </motion.div>
+        )}
+        
+        <motion.div
+          initial={{ scale: 0.8, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ delay: 0.3 }}
+          className={styles.timeDisplay}
+        >
+          {formatTime(duration)} / {formatTime(maxDuration)}
+        </motion.div>
+        
+        <motion.div
+          initial={{ width: 0 }}
+          animate={{ width: '80%' }}
+          transition={{ delay: 0.4 }}
+          className={styles.progressContainer}
+        >
+          <div 
+            className={styles.progressBar}
+            style={{ width: `${progress}%` }}
+          />
+        </motion.div>
+        
+        <motion.div
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.5 }}
+          className={styles.buttonContainer}
+        >
+          <button
+            onClick={handleStop}
+            className={classNames(styles.actionButton, styles.stopButton)}
+          >
+            <span className={styles.buttonIcon}>⏹</span>
+            停止
+          </button>
           
-          <IconButton
+          <button
             onClick={handleStop}
-            sx={{ 
-              bgcolor: 'green', 
-              color: 'white',
-              width: 80,
-              height: 80,
-              '&:hover': { bgcolor: 'darkgreen' }
-            }}
+            className={classNames(styles.actionButton, styles.completeButton)}
           >
-            <CheckCircle fontSize="large" />
-          </IconButton>
-        </Box>
-      </DialogContent>
-    </Dialog>
+            <span className={styles.buttonIcon}>✓</span>
+            完了
+          </button>
+        </motion.div>
+      </div>
+    </Modal>
   );
 };
 
 export default RecordingModal;
 ```
 
-### 4.3 ページコンポーネント
-
-#### MemoTimeline（タイムライン表示）
-```typescript
-// components/pages/memo/MemoTimeline.tsx
-import React from 'react';
-import { 
-  List, 
-  ListItem, 
-  Divider, 
-  Typography, 
-  Box 
-} from '@mui/material';
-import { MemoCard } from './MemoCard';
-import { Memo } from '@/types';
-
-interface MemoTimelineProps {
-  memos: Memo[];
-  loading: boolean;
-  onPlayAudio: (audioUrl: string) => void;
-  onDeleteMemo: (memoId: string) => void;
+```css
+/* components/modals/RecordingModal/RecordingModal.module.css */
+.container {
+  @apply flex flex-col items-center justify-center h-full p-8;
+  background: linear-gradient(135deg, rgba(31, 41, 55, 0.95), rgba(17, 24, 39, 0.95));
+  backdrop-filter: blur(20px);
 }
 
-const MemoTimeline: React.FC<MemoTimelineProps> = ({
-  memos,
-  loading,
-  onPlayAudio,
-  onDeleteMemo
-}) => {
-  // 日付でグループ化
-  const groupedMemos = memos.reduce((groups, memo) => {
-    const date = memo.createdAt.toDateString();
-    if (!groups[date]) {
-      groups[date] = [];
-    }
-    groups[date].push(memo);
-    return groups;
-  }, {} as Record<string, Memo[]>);
+.title {
+  @apply text-4xl font-bold text-white mb-8;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
 
-  const formatDateHeader = (dateString: string) => {
-    const date = new Date(dateString);
-    const today = new Date();
-    const yesterday = new Date(today);
-    yesterday.setDate(yesterday.getDate() - 1);
+.waveformContainer {
+  @apply mb-8;
+}
 
-    if (date.toDateString() === today.toDateString()) {
-      return 'Today';
-    } else if (date.toDateString() === yesterday.toDateString()) {
-      return 'Yesterday';
-    } else {
-      return date.toLocaleDateString('ja-JP', {
-        month: 'long',
-        day: 'numeric'
-      });
-    }
-  };
+.timeDisplay {
+  @apply text-6xl font-mono text-white mb-6;
+  text-shadow: 0 2px 8px rgba(124, 58, 237, 0.5);
+}
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
+.progressContainer {
+  @apply h-2 bg-gray-700 rounded-full mb-8 relative overflow-hidden;
+}
 
-  return (
-    <List sx={{ width: '100%', bgcolor: 'background.paper' }}>
-      {Object.entries(groupedMemos).map(([dateString, dayMemos]) => (
-        <Box key={dateString}>
-          <Typography
-            variant="h6"
-            sx={{
-              px: 2,
-              py: 1,
-              bgcolor: 'grey.100',
-              color: 'text.secondary',
-              fontWeight: 'bold'
-            }}
-          >
-            {formatDateHeader(dateString)}
-          </Typography>
-          
-          {dayMemos.map((memo, index) => (
-            <React.Fragment key={memo.id}>
-              <ListItem sx={{ px: 1 }}>
-                <MemoCard
-                  memo={memo}
-                  onPlay={() => onPlayAudio(memo.audioUrl)}
-                  onDelete={() => onDeleteMemo(memo.id)}
-                />
-              </ListItem>
-              {index < dayMemos.length - 1 && <Divider />}
-            </React.Fragment>
-          ))}
-        </Box>
-      ))}
-    </List>
-  );
-};
+.progressBar {
+  @apply h-full rounded-full transition-all duration-1000 ease-out;
+  background: var(--main-gradient);
+  box-shadow: 0 0 10px rgba(124, 58, 237, 0.5);
+}
 
-export default MemoTimeline;
+.buttonContainer {
+  @apply flex gap-6;
+}
+
+.actionButton {
+  @apply flex flex-col items-center justify-center w-20 h-20 rounded-full text-white font-semibold transition-all duration-200;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.actionButton:hover {
+  @apply transform scale-105;
+}
+
+.actionButton:active {
+  @apply transform scale-95;
+}
+
+.stopButton {
+  background: linear-gradient(135deg, #EF4444, #DC2626);
+}
+
+.stopButton:hover {
+  background: linear-gradient(135deg, #DC2626, #B91C1C);
+}
+
+.completeButton {
+  background: var(--main-gradient);
+}
+
+.completeButton:hover {
+  background: linear-gradient(135deg, #6366F1, #5B21B6);
+}
+
+.buttonIcon {
+  @apply text-2xl mb-1;
+}
 ```
 
-#### MemoCard（個別メモカード）
-```typescript
-// components/pages/memo/MemoCard.tsx
-import React from 'react';
-import {
-  Card,
-  CardContent,
-  Typography,
-  IconButton,
-  Box,
-  Chip
-} from '@mui/material';
-import {
-  PlayArrow,
-  Pause,
-  Delete,
-  MusicNote
-} from '@mui/icons-material';
-import { Memo } from '@/types';
+### 4.3 スタイル設定・アニメーション設計
 
-interface MemoCardProps {
-  memo: Memo;
-  onPlay: () => void;
-  onDelete: () => void;
-  isPlaying?: boolean;
-}
+#### globals.css（Tailwind + CSS変数）
+```css
+/* src/styles/globals.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-const MemoCard: React.FC<MemoCardProps> = ({
-  memo,
-  onPlay,
-  onDelete,
-  isPlaying = false
-}) => {
-  const formatTime = (timestamp: Date) => {
-    return timestamp.toLocaleTimeString('ja-JP', {
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  };
-
-  const formatDuration = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
-  };
-
-  return (
-    <Card 
-      sx={{ 
-        width: '100%', 
-        mb: 1,
-        boxShadow: 1,
-        '&:hover': { boxShadow: 3 }
-      }}
-    >
-      <CardContent sx={{ pb: 1 }}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-          <Typography variant="subtitle2" color="text.secondary">
-            💭 {memo.title || 'メモ'}
-          </Typography>
-          <Typography variant="caption" color="text.secondary">
-            {formatTime(memo.createdAt)}
-          </Typography>
-        </Box>
-        
-        <Typography 
-          variant="body2" 
-          sx={{ 
-            mb: 2,
-            display: '-webkit-box',
-            WebkitLineClamp: 3,
-            WebkitBoxOrient: 'vertical',
-            overflow: 'hidden'
-          }}
-        >
-          "{memo.transcription || memo.textContent}"
-        </Typography>
-        
-        <Box sx={{ 
-          display: 'flex', 
-          justifyContent: 'space-between', 
-          alignItems: 'center' 
-        }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <IconButton
-              onClick={onPlay}
-              size="small"
-              sx={{ 
-                bgcolor: isPlaying ? 'secondary.main' : 'primary.main',
-                color: 'white',
-                '&:hover': { 
-                  bgcolor: isPlaying ? 'secondary.dark' : 'primary.dark' 
-                }
-              }}
-            >
-              {isPlaying ? <Pause /> : <PlayArrow />}
-            </IconButton>
-            
-            <Chip
-              icon={<MusicNote />}
-              label={formatDuration(memo.duration)}
-              size="small"
-              variant="outlined"
-            />
-          </Box>
-          
-          <IconButton
-            onClick={onDelete}
-            size="small"
-            sx={{ color: 'error.main' }}
-          >
-            <Delete />
-          </IconButton>
-        </Box>
-      </CardContent>
-    </Card>
-  );
-};
-
-export default MemoCard;
-```
-
-### 4.4 Storybook設定
-
-#### Button Stories
-```typescript
-// components/common/buttons/FloatingActionButton.stories.tsx
-import type { Meta, StoryObj } from '@storybook/react';
-import { FloatingActionButton } from './FloatingActionButton';
-
-const meta: Meta<typeof FloatingActionButton> = {
-  title: 'Common/Buttons/FloatingActionButton',
-  component: FloatingActionButton,
-  parameters: {
-    layout: 'centered',
-  },
-  argTypes: {
-    recording: {
-      control: 'boolean',
-      description: '録音中かどうか',
-    },
-    disabled: {
-      control: 'boolean',
-      description: '無効状態',
-    },
-  },
-};
-
-export default meta;
-type Story = StoryObj<typeof meta>;
-
-export const Default: Story = {
-  args: {
-    recording: false,
-    onClick: () => console.log('録音開始'),
-  },
-};
-
-export const Recording: Story = {
-  args: {
-    recording: true,
-    onClick: () => console.log('録音停止'),
-  },
-};
-
-export const Disabled: Story = {
-  args: {
-    recording: false,
-    disabled: true,
-    onClick: () => console.log('無効状態'),
-  },
-};
-```
-
-## 5. 状態管理設計
-
-### 5.1 状態管理戦略
-- **Local State**: コンポーネント内部状態（useState）
-- **Global State**: Context API + useReducer
-- **Server State**: カスタムフック（useFirestore）
-- **Derived State**: useMemo、useCallback
-
-### 5.2 Context構成
-
-#### AuthContext（認証状態）
-```typescript
-// stores/AuthContext.tsx
-import React, { createContext, useContext, useReducer, useEffect } from 'react';
-import { User } from 'firebase/auth';
-import { authService } from '@/services/firebase/auth';
-
-interface AuthState {
-  user: User | null;
-  loading: boolean;
-  error: string | null;
-}
-
-type AuthAction =
-  | { type: 'AUTH_LOADING' }
-  | { type: 'AUTH_SUCCESS'; payload: User | null }
-  | { type: 'AUTH_ERROR'; payload: string }
-  | { type: 'AUTH_LOGOUT' };
-
-const authReducer = (state: AuthState, action: AuthAction): AuthState => {
-  switch (action.type) {
-    case 'AUTH_LOADING':
-      return { ...state, loading: true, error: null };
-    case 'AUTH_SUCCESS':
-      return { user: action.payload, loading: false, error: null };
-    case 'AUTH_ERROR':
-      return { ...state, loading: false, error: action.payload };
-    case 'AUTH_LOGOUT':
-      return { user: null, loading: false, error: null };
-    default:
-      return state;
-  }
-};
-
-interface AuthContextType extends AuthState {
-  login: (email: string, password: string) => Promise<void>;
-  logout: () => Promise<void>;
-  signUp: (email: string, password: string) => Promise<void>;
-}
-
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
-
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ 
-  children 
-}) => {
-  const [state, dispatch] = useReducer(authReducer, {
-    user: null,
-    loading: true,
-    error: null
-  });
-
-  useEffect(() => {
-    const unsubscribe = authService.onAuthStateChange((user) => {
-      dispatch({ type: 'AUTH_SUCCESS', payload: user });
-    });
-    return unsubscribe;
-  }, []);
-
-  const login = async (email: string, password: string) => {
-    try {
-      dispatch({ type: 'AUTH_LOADING' });
-      await authService.login(email, password);
-    } catch (error) {
-      dispatch({ 
-        type: 'AUTH_ERROR', 
-        payload: error instanceof Error ? error.message : 'ログインに失敗しました' 
-      });
-    }
-  };
-
-  const logout = async () => {
-    try {
-      await authService.logout();
-      dispatch({ type: 'AUTH_LOGOUT' });
-    } catch (error) {
-      dispatch({ 
-        type: 'AUTH_ERROR', 
-        payload: error instanceof Error ? error.message : 'ログアウトに失敗しました' 
-      });
-    }
-  };
-
-  const signUp = async (email: string, password: string) => {
-    try {
-      dispatch({ type: 'AUTH_LOADING' });
-      await authService.signUp(email, password);
-    } catch (error) {
-      dispatch({ 
-        type: 'AUTH_ERROR', 
-        payload: error instanceof Error ? error.message : '登録に失敗しました' 
-      });
-    }
-  };
-
-  return (
-    <AuthContext.Provider value={{ ...state, login, logout, signUp }}>
-      {children}
-    </AuthContext.Provider>
-  );
-};
-
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
-};
-```
-
-#### MemoContext（メモデータ状態）
-```typescript
-// stores/MemoContext.tsx
-import React, { createContext, useContext, useReducer } from 'react';
-import { Memo } from '@/types';
-
-interface MemoState {
-  memos: Memo[];
-  loading: boolean;
-  error: string | null;
-  hasMore: boolean;
-}
-
-type MemoAction =
-  | { type: 'MEMOS_LOADING' }
-  | { type: 'MEMOS_LOADED'; payload: { memos: Memo[]; hasMore: boolean } }
-  | { type: 'MEMO_ADDED'; payload: Memo }
-  | { type: 'MEMO_UPDATED'; payload: Memo }
-  | { type: 'MEMO_DELETED'; payload: string }
-  | { type: 'MEMOS_ERROR'; payload: string }
-  | { type: 'MEMOS_RESET' };
-
-const memoReducer = (state: MemoState, action: MemoAction): MemoState => {
-  switch (action.type) {
-    case 'MEMOS_LOADING':
-      return { ...state, loading: true, error: null };
-    case 'MEMOS_LOADED':
-      return {
-        ...state,
-        memos: action.payload.memos,
-        hasMore: action.payload.hasMore,
-        loading: false,
-        error: null
-      };
-    case 'MEMO_ADDED':
-      return {
-        ...state,
-        memos: [action.payload, ...state.memos]
-      };
-    case 'MEMO_UPDATED':
-      return {
-        ...state,
-        memos: state.memos.map(memo =>
-          memo.id === action.payload.id ? action.payload : memo
-        )
-      };
-    case 'MEMO_DELETED':
-      return {
-        ...state,
-        memos: state.memos.filter(memo => memo.id !== action.payload)
-      };
-    case 'MEMOS_ERROR':
-      return { ...state, loading: false, error: action.payload };
-    case 'MEMOS_RESET':
-      return { memos: [], loading: false, error: null, hasMore: true };
-    default:
-      return state;
-  }
-};
-
-interface MemoContextType extends MemoState {
-  loadMemos: () => Promise<void>;
-  addMemo: (memo: Omit<Memo, 'id' | 'createdAt'>) => Promise<void>;
-  updateMemo: (id: string, updates: Partial<Memo>) => Promise<void>;
-  deleteMemo: (id: string) => Promise<void>;
-  searchMemos: (query: string) => Promise<void>;
-}
-
-const MemoContext = createContext<MemoContextType | undefined>(undefined);
-
-export const MemoProvider: React.FC<{ children: React.ReactNode }> = ({ 
-  children 
-}) => {
-  const [state, dispatch] = useReducer(memoReducer, {
-    memos: [],
-    loading: false,
-    error: null,
-    hasMore: true
-  });
-
-  // 実装は後述のサービス層で詳細化
-  const loadMemos = async () => {
-    // firestoreService.getMemos() 実装
-  };
-
-  const addMemo = async (memo: Omit<Memo, 'id' | 'createdAt'>) => {
-    // firestoreService.addMemo() 実装
-  };
-
-  const updateMemo = async (id: string, updates: Partial<Memo>) => {
-    // firestoreService.updateMemo() 実装
-  };
-
-  const deleteMemo = async (id: string) => {
-    // firestoreService.deleteMemo() 実装
-  };
-
-  const searchMemos = async (query: string) => {
-    // firestoreService.searchMemos() 実装
-  };
-
-  return (
-    <MemoContext.Provider value={{
-      ...state,
-      loadMemos,
-      addMemo,
-      updateMemo,
-      deleteMemo,
-      searchMemos
-    }}>
-      {children}
-    </MemoContext.Provider>
-  );
-};
-
-export const useMemos = () => {
-  const context = useContext(MemoContext);
-  if (!context) {
-    throw new Error('useMemos must be used within a MemoProvider');
-  }
-  return context;
-};
-```
-
-#### UIContext（UI状態）
-```typescript
-// stores/UIContext.tsx
-import React, { createContext, useContext, useReducer } from 'react';
-
-interface UIState {
-  recordingModalOpen: boolean;
-  transcribingModalOpen: boolean;
-  currentlyPlaying: string | null;
-  searchQuery: string;
-  theme: 'light' | 'dark';
-}
-
-type UIAction =
-  | { type: 'OPEN_RECORDING_MODAL' }
-  | { type: 'CLOSE_RECORDING_MODAL' }
-  | { type: 'OPEN_TRANSCRIBING_MODAL' }
-  | { type: 'CLOSE_TRANSCRIBING_MODAL' }
-  | { type: 'SET_CURRENTLY_PLAYING'; payload: string | null }
-  | { type: 'SET_SEARCH_QUERY'; payload: string }
-  | { type: 'TOGGLE_THEME' };
-
-const uiReducer = (state: UIState, action: UIAction): UIState => {
-  switch (action.type) {
-    case 'OPEN_RECORDING_MODAL':
-      return { ...state, recordingModalOpen: true };
-    case 'CLOSE_RECORDING_MODAL':
-      return { ...state, recordingModalOpen: false };
-    case 'OPEN_TRANSCRIBING_MODAL':
-      return { ...state, transcribingModalOpen: true };
-    case 'CLOSE_TRANSCRIBING_MODAL':
-      return { ...state, transcribingModalOpen: false };
-    case 'SET_CURRENTLY_PLAYING':
-      return { ...state, currentlyPlaying: action.payload };
-    case 'SET_SEARCH_QUERY':
-      return { ...state, searchQuery: action.payload };
-    case 'TOGGLE_THEME':
-      return { 
-        ...state, 
-        theme: state.theme === 'light' ? 'dark' : 'light' 
-      };
-    default:
-      return state;
-  }
-};
-
-interface UIContextType extends UIState {
-  openRecordingModal: () => void;
-  closeRecordingModal: () => void;
-  openTranscribingModal: () => void;
-  closeTranscribingModal: () => void;
-  setCurrentlyPlaying: (memoId: string | null) => void;
-  setSearchQuery: (query: string) => void;
-  toggleTheme: () => void;
-}
-
-const UIContext = createContext<UIContextType | undefined>(undefined);
-
-export const UIProvider: React.FC<{ children: React.ReactNode }> = ({ 
-  children 
-}) => {
-  const [state, dispatch] = useReducer(uiReducer, {
-    recordingModalOpen: false,
-    transcribingModalOpen: false,
-    currentlyPlaying: null,
-    searchQuery: '',
-    theme: 'light'
-  });
-
-  const openRecordingModal = () => dispatch({ type: 'OPEN_RECORDING_MODAL' });
-  const closeRecordingModal = () => dispatch({ type: 'CLOSE_RECORDING_MODAL' });
-  const openTranscribingModal = () => dispatch({ type: 'OPEN_TRANSCRIBING_MODAL' });
-  const closeTranscribingModal = () => dispatch({ type: 'CLOSE_TRANSCRIBING_MODAL' });
-  const setCurrentlyPlaying = (memoId: string | null) => 
-    dispatch({ type: 'SET_CURRENTLY_PLAYING', payload: memoId });
-  const setSearchQuery = (query: string) => 
-    dispatch({ type: 'SET_SEARCH_QUERY', payload: query });
-  const toggleTheme = () => dispatch({ type: 'TOGGLE_THEME' });
-
-  return (
-    <UIContext.Provider value={{
-      ...state,
-      openRecordingModal,
-      closeRecordingModal,
-      openTranscribingModal,
-      closeTranscribingModal,
-      setCurrentlyPlaying,
-      setSearchQuery,
-      toggleTheme
-    }}>
-      {children}
-    </UIContext.Provider>
-  );
-};
-
-export const useUI = () => {
-  const context = useContext(UIContext);
-  if (!context) {
-    throw new Error('useUI must be used within a UIProvider');
-  }
-  return context;
-};
-```
-
-### 5.3 Store構成
-```typescript
-// stores/index.ts
-export { AuthProvider, useAuth } from './AuthContext';
-export { MemoProvider, useMemos } from './MemoContext';
-export { UIProvider, useUI } from './UIContext';
-
-// App.tsx での使用例
-const App = () => {
-  return (
-    <AuthProvider>
-      <MemoProvider>
-        <UIProvider>
-          <Router>
-            <Routes>
-              <Route path="/" element={<MemoListPage />} />
-              <Route path="/login" element={<LoginPage />} />
-              <Route path="/settings" element={<SettingsPage />} />
-            </Routes>
-          </Router>
-        </UIProvider>
-      </MemoProvider>
-    </AuthProvider>
-  );
-};
-```
-
-### 5.4 データフロー
-```typescript
-// 録音→保存→表示のフロー例
-const handleStartRecording = () => {
-  openRecordingModal(); // UI State
-  // 録音開始
-};
-
-const handleCompleteRecording = async (audioBlob: Blob) => {
-  closeRecordingModal(); // UI State
-  openTranscribingModal(); // UI State
+/* CSS変数定義 */
+:root {
+  /* ベースカラー */
+  --base-primary: #FFFFFF;
+  --base-secondary: #F9FAFB;
+  --base-tertiary: #F3F4F6;
+  --base-border: #E5E7EB;
+  --base-text-primary: #111827;
+  --base-text-secondary: #6B7280;
   
-  try {
-    // 1. 音声ファイルをStorageに保存
-    const audioUrl = await storageService.uploadAudio(audioBlob);
-    
-    // 2. 文字起こし実行
-    const transcription = await whisperService.transcribe(audioBlob);
-    
-    // 3. Firestoreに保存
-    const memo = await addMemo({
-      audioUrl,
-      transcription,
-      duration: audioDuration,
-      // ...other properties
-    });
-    
-    closeTranscribingModal(); // UI State
-    // 4. 成功通知表示
-    showSuccessToast('メモを保存しました');
-    
-  } catch (error) {
-    closeTranscribingModal();
-    showErrorMessage('保存に失敗しました');
+  /* メインカラー */
+  --main-primary: #7C3AED;
+  --main-secondary: #6366F1;
+  --main-light: #C4B5FD;
+  --main-dark: #5B21B6;
+  --main-gradient: linear-gradient(135deg, #7C3AED, #6366F1);
+  
+  /* アクセントカラー */
+  --accent-primary: #EC4899;
+  --accent-warning: #F59E0B;
+  --accent-success: #10B981;
+  --accent-error: #EF4444;
+}
+
+/* ダークモード */
+[data-theme="dark"] {
+  --base-primary: #1F2937;
+  --base-secondary: #111827;
+  --base-tertiary: #374151;
+  --base-border: #4B5563;
+  --base-text-primary: #F9FAFB;
+  --base-text-secondary: #D1D5DB;
+}
+
+/* グローバルスタイル */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans JP', sans-serif;
+  background-color: var(--base-secondary);
+  color: var(--base-text-primary);
+  margin: 0;
+  padding: 0;
+  line-height: 1.6;
+}
+
+/* スクロールバー */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--base-tertiary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--main-primary);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--main-dark);
+}
+
+/* フォーカス */
+*:focus {
+  outline: 2px solid var(--main-primary);
+  outline-offset: 2px;
+}
+
+/* アニメーション */
+.fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+.slide-in-up {
+  animation: slideInUp 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideInUp {
+  from { 
+    opacity: 0; 
+    transform: translateY(20px); 
   }
-};
+  to { 
+    opacity: 1; 
+    transform: translateY(0); 
+  }
+}
 ```
 
-### 5.5 キャッシュ戦略
-```typescript
-// hooks/useFirestore.ts - Server State管理
-import { useEffect, useState } from 'react';
-import { collection, onSnapshot, query, orderBy, limit } from 'firebase/firestore';
-import { db } from '@/services/firebase';
-
-export const useRealtimeMemos = (userId: string) => {
-  const [memos, setMemos] = useState<Memo[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!userId) return;
-
-    const memosQuery = query(
-      collection(db, 'memos'),
-      orderBy('createdAt', 'desc'),
-      limit(50)
-    );
-
-    const unsubscribe = onSnapshot(
-      memosQuery,
-      (snapshot) => {
-        const memosData = snapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        })) as Memo[];
+#### Tailwind設定（tailwind.config.js）
+```javascript
+// tailwind.config.js
+/** @type {import('tailwindcss').Config} */
+export default {
+  content: [
+    "./index.html",
+    "./src/**/*.{js,ts,jsx,tsx}",
+  ],
+  theme: {
+    extend: {
+      colors: {
+        // カスタムカラーパレット
+        'base-primary': 'var(--base-primary)',
+        'base-secondary': 'var(--base-secondary)',
+        'base-tertiary': 'var(--base-tertiary)',
+        'base-border': 'var(--base-border)',
+        'base-text-primary': 'var(--base-text-primary)',
+        'base-text-secondary': 'var(--base-text-secondary)',
         
-        setMemos(memosData);
-        setLoading(false);
+        'main-primary': 'var(--main-primary)',
+        'main-secondary': 'var(--main-secondary)',
+        'main-light': 'var(--main-light)',
+        'main-dark': 'var(--main-dark)',
+        
+        'accent-primary': 'var(--accent-primary)',
+        'accent-warning': 'var(--accent-warning)',
+        'accent-success': 'var(--accent-success)',
+        'accent-error': 'var(--accent-error)',
       },
-      (error) => {
-        setError(error.message);
-        setLoading(false);
-      }
-    );
-
-    return unsubscribe;
-  }, [userId]);
-
-  return { memos, loading, error };
-};
+      spacing: {
+        '18': '4.5rem', // 72px (メッセージバブル用)
+        '88': '22rem',   // 352px
+        '128': '32rem',  // 512px
+      },
+      borderRadius: {
+        'bubble': '18px', // LINE風角丸
+      },
+      fontFamily: {
+        'sans': [
+          '-apple-system', 
+          'BlinkMacSystemFont', 
+          'Segoe UI', 
+          'Roboto', 
+          'Noto Sans JP', 
+          'sans-serif'
+        ],
+      },
+      boxShadow: {
+        'bubble': '0 2px 8px rgba(124, 58, 237, 0.25)',
+        'card': '0 1px 3px rgba(0, 0, 0, 0.1)',
+        'modal': '0 4px 20px rgba(124, 58, 237, 0.4)',
+      },
+      animation: {
+        'pulse-recording': 'pulse-recording 1.5s ease-in-out infinite',
+        'trophy-slide': 'trophy-slide 3s ease-in-out',
+      },
+      keyframes: {
+        'pulse-recording': {
+          '0%, 100%': { 
+            transform: 'scale(1)', 
+            boxShadow: '0 0 0 0 rgba(236, 72, 153, 0.7)' 
+          },
+          '50%': { 
+            transform: 'scale(1.05)', 
+            boxShadow: '0 0 0 10px rgba(236, 72, 153, 0)' 
+          },
+        },
+        'trophy-slide': {
+          '0%': { transform: 'translateX(100%)' },
+          '10%': { transform: 'translateX(0)' },
+          '90%': { transform: 'translateX(0)', opacity: '1' },
+          '100%': { transform: 'translateX(100%)', opacity: '0' },
+        },
+      },
+    },
+  },
+  plugins: [],
+  darkMode: ['class', '[data-theme="dark"]'],
+}
 ```
 
-このように、Context APIを使用したState管理により、各コンポーネント間でのデータ共有とリアルタイム更新を実現します。次にFirestoreのデータベース設計に進みます。
+## 5. 実装優先順位・移行計画
+
+### 5.1 Phase 1: 基盤構築（Material-UI削除）
+#### 優先度: 最高 🔥
+1. **カラーパレット・CSS変数設定**
+   - `globals.css`、`tailwind.config.js`作成
+   - CSS変数によるテーマシステム構築
+
+2. **基本UIコンポーネント**
+   - `Button`、`Input`、`Card`、`Modal`コンポーネント
+   - CSS Modules + Tailwindによる実装
+
+3. **レイアウトコンポーネント**
+   - `ChatLayout`、`Header`コンポーネント
+   - LINE風レスポンシブレイアウト
+
+### 5.2 Phase 2: メッセージング機能（LINE風UI）
+#### 優先度: 高 ⭐
+1. **MessageBubble実装**
+   - 自分・システムメッセージ対応
+   - Framer Motionアニメーション追加
+
+2. **Timeline機能**
+   - 無限スクロール、日付グループ化
+   - メッセージ送信・表示ロジック
+
+3. **InputArea実装**
+   - 自動拡張テキストエリア
+   - 🎤ボタン統合
+
+### 5.3 Phase 3: 録音・音声機能
+#### 優先度: 高 ⭐
+1. **RecordingModal実装**
+   - フルスクリーンモーダル
+   - 波形アニメーション、プログレス表示
+
+2. **AudioMessage実装**
+   - 音声再生、波形可視化
+   - 再生状態管理
+
+3. **音声録音・文字起こし機能**
+   - 既存のuseAudioRecordingフック活用
+   - UI統合
+
+### 5.4 Phase 4: 仕上げ・最適化
+#### 優先度: 中 📝
+1. **アニメーション・マイクロインタラクション**
+   - メッセージ送信アニメーション
+   - トロフィー風通知
+   - ホバー・フォーカス効果
+
+2. **ダークモード対応**
+   - テーマ切り替え機能
+   - CSS変数活用
+
+3. **アクセシビリティ対応**
+   - キーボードナビゲーション
+   - スクリーンリーダー対応
+
+## 6. 技術移行・削除内容
+
+### 6.1 削除対象（Material-UI関連）
+```json
+// package.json - 削除対象
+{
+  "dependencies": {
+    "@mui/material": "^5.x.x",
+    "@mui/icons-material": "^5.x.x",
+    "@emotion/react": "^11.x.x",
+    "@emotion/styled": "^11.x.x"
+  }
+}
+```
+
+### 6.2 追加対象（新UI技術）
+```json
+// package.json - 追加対象
+{
+  "dependencies": {
+    "framer-motion": "^10.x.x",
+    "classnames": "^2.x.x"
+  },
+  "devDependencies": {
+    "@types/classnames": "^2.x.x"
+  }
+}
+```
+
+### 6.3 移行作業マップ
+| 旧コンポーネント | 新コンポーネント | 移行作業 |
+|------------------|------------------|----------|
+| `@mui/material/Fab` | `FloatingButton.tsx` | カスタム実装 |
+| `@mui/material/Dialog` | `Modal.tsx` | ベースコンポーネント作成 |
+| `@mui/material/List` | `Timeline.tsx` | LINE風レイアウト |
+| `@mui/material/Card` | `MessageBubble.tsx` | バブル形状実装 |
+| `@mui/material/TextField` | `Input.tsx` | 自動拡張機能 |
+| Material-UIテーマ | CSS変数システム | 完全置き換え |
+
+## 7. 品質保証・テスト戦略
+
+### 7.1 視覚回帰テスト
+- **Storybook**: 全カスタムコンポーネントのStory作成
+- **Chromatic**: 視覚的差分検出（Material-UI→カスタムUI）
+
+### 7.2 ユーザビリティテスト
+- **LINE風UI**: 使いやすさの検証
+- **タッチ操作**: モバイルでのタップ精度確認
+- **アニメーション**: 過剰でないか、快適性確認
+
+### 7.3 パフォーマンステスト
+- **バンドルサイズ**: Material-UI削除による軽量化測定
+- **レンダリング**: 大量メッセージでの描画性能
+- **メモリ**: 長時間利用時のメモリリーク検証
+
+## 8. 完了チェックリスト
+
+### 基盤・設計 ✅
+- [x] 要件定義書との整合性確認
+- [x] UI設計書との整合性確認  
+- [x] カラーパレット・CSS変数定義
+- [x] ファイル構成設計更新
+- [x] コンポーネント設計（Atomic Design + LINE風）
+
+### 技術設計 ✅
+- [x] Material-UI完全削除計画
+- [x] Tailwind CSS + CSS Modules設計
+- [x] Framer Motionアニメーション設計
+- [x] レスポンシブデザイン設計
+
+### 実装指針 ✅
+- [x] 実装優先順位明確化
+- [x] 移行作業マップ作成
+- [x] パフォーマンス最適化方針
+- [x] テスト戦略定義
+
+---
+
+## 改版履歴
+- **v2.0 (2024-08-10)**: LINE風紫系UIへ全面刷新、Material-UI削除、カスタムコンポーネント設計
+- **v1.0 (2024-08-03)**: 初版作成（Material-UI基盤）
+
+**次ステップ**: UI実装開始（Phase 1: 基盤構築）

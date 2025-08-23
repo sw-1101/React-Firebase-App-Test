@@ -1,9 +1,9 @@
 // ユーザー登録ページコンポーネント
 import React, { useEffect } from 'react'
-import { Container, Box, Typography, Link } from '@mui/material'
 import { Link as RouterLink, useNavigate } from 'react-router-dom'
 import { RegisterForm } from '../components/auth'
 import { useAuth } from '../contexts/AuthContext'
+import styles from './RegisterPage.module.css'
 
 const RegisterPage: React.FC = () => {
   const navigate = useNavigate()
@@ -12,47 +12,39 @@ const RegisterPage: React.FC = () => {
   // 認証済みユーザーは自動的にダッシュボードへリダイレクト
   useEffect(() => {
     if (state.user && !state.loading) {
-      navigate('/dashboard')
+      navigate('/menu')
     }
   }, [state.user, state.loading, navigate])
 
   const handleRegisterSuccess = () => {
-    navigate('/dashboard')
+    navigate('/menu')
   }
 
   if (state.loading) {
     return (
-      <Container maxWidth="sm">
-        <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh">
-          <Typography>読み込み中...</Typography>
-        </Box>
-      </Container>
+      <div className={styles.container}>
+        <div className={styles.loadingContainer}>
+          <div className={styles.loadingText}>読み込み中...</div>
+        </div>
+      </div>
     )
   }
 
   return (
-    <Container maxWidth="sm">
-      <Box
-        sx={{
-          minHeight: '100vh',
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          py: 4,
-        }}
-      >
+    <div className={styles.container}>
+      <div className={styles.content}>
         <RegisterForm onSuccess={handleRegisterSuccess} />
         
-        <Box sx={{ mt: 2, textAlign: 'center' }}>
-          <Typography variant="body2">
+        <div className={styles.loginLinkContainer}>
+          <div className={styles.loginText}>
             すでにアカウントをお持ちの方は{' '}
-            <Link component={RouterLink} to="/login">
+            <RouterLink to="/login" className={styles.loginLink}>
               こちらからログイン
-            </Link>
-          </Typography>
-        </Box>
-      </Box>
-    </Container>
+            </RouterLink>
+          </div>
+        </div>
+      </div>
+    </div>
   )
 }
 

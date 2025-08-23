@@ -95,6 +95,7 @@ export interface CreateMemoData {
 export interface UpdateMemoData {
   title?: string;
   audioUrl?: string;
+  duration?: number;
   transcription?: string;
   transcriptionStatus?: TranscriptionStatus;
   transcriptionRetryCount?: number;
@@ -102,6 +103,7 @@ export interface UpdateMemoData {
   language?: string;
   confidence?: number;
   segments?: any[];
+  fileSize?: number;
   updatedAt?: Timestamp;
 }
 

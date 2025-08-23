@@ -13,8 +13,8 @@ import {
   IconButton,
   Alert,
   Avatar,
-} from '@mui/material'
-import { ArrowBack, Save, AccountCircle } from '@mui/icons-material'
+} from '@/utils/mui-fallbacks'
+import { ArrowBack, Save, AccountCircle } from '@/utils/mui-fallbacks'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { updateProfile } from 'firebase/auth'
@@ -60,7 +60,7 @@ const ProfilePage: React.FC = () => {
           <IconButton
             edge="start"
             color="inherit"
-            onClick={() => navigate('/dashboard')}
+            onClick={() => navigate('/menu')}
           >
             <ArrowBack />
           </IconButton>
@@ -120,7 +120,7 @@ const ProfilePage: React.FC = () => {
                 fullWidth
                 label="表示名"
                 value={displayName}
-                onChange={(e) => setDisplayName(e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDisplayName(e.target.value)}
                 margin="normal"
                 helperText="他のユーザーに表示される名前です"
               />
@@ -138,7 +138,7 @@ const ProfilePage: React.FC = () => {
                 
                 <Button
                   variant="outlined"
-                  onClick={() => navigate('/dashboard')}
+                  onClick={() => navigate('/menu')}
                 >
                   キャンセル
                 </Button>
