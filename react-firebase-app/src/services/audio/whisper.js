@@ -1,16 +1,4 @@
-import {
-  type WhisperTranscriptionRequest,
-  type WhisperTranscriptionResponse,
-  type WhisperVerboseResponse,
-  type TranscriptionConfig,
-  type TranscriptionRequest,
-  type TranscriptionResult,
-  type TranscriptionError,
-  type TranscriptionErrorType,
-  type TranscriptionServiceStatus,
-  type BatchTranscriptionRequest,
-  type BatchTranscriptionResult
-} from '../../types/memo/Whisper';
+// Types removed for JavaScript conversion
 
 /**
  * OpenAI Whisper API Service

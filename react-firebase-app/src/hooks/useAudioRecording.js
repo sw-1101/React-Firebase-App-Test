@@ -1,10 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { 
-  type RecordingState, 
-  type AudioRecording, 
-  type AudioError,
-  type RecordingSession 
-} from '../types/memo/Audio';
+// Types removed for JavaScript conversion
 import { getAudioRecorder, audioUtils } from '../services/audio/recorder';
 import { AUDIO_CONFIG } from '../constants/audioConfig';
 

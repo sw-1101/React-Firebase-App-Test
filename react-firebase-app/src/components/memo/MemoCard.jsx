@@ -1,7 +1,9 @@
 import React from 'react';
 import classNames from 'classnames';
 import styles from './MemoCard.module.css';
-import { hasText, hasAudio } from '@/types/memo';
+// Utility functions moved inline
+const hasText = (memo) => memo?.type === 'text' || memo?.type === 'mixed';
+const hasAudio = (memo) => memo?.type === 'audio' || memo?.type === 'mixed';
 
 /**
  * メモカードコンポーネント

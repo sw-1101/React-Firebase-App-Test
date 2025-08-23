@@ -1,11 +1,4 @@
-import { 
-  type AudioRecording, 
-  type RecordingSession, 
-  type RecordingState, 
-  type AudioError,
-  type AudioErrorType,
-  type AudioCompatibility
-} from '../../types/memo/Audio';
+// Types removed for JavaScript conversion
 import { AUDIO_CONFIG, AUDIO_CONSTRAINTS, RECORDER_OPTIONS } from '../../constants/audioConfig';
 
 /**
